@@ -1,9 +1,8 @@
 ﻿using Akka.Actor;
 using Asynkron.Akka;
-using Asynkron.Akka.Observable;
 
 var system = ActorSystem.Create("MySystem");
-var obs = Observable.For(system);
+var obs = Asynkron.Akka.OpenTelemetry.OpenTelemetry.For(system);
 
 var r = system.ActorOf<MyActor>();
 r.Tell("Hello");

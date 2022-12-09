@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace Asynkron.Akka.Observable;
+﻿namespace Asynkron.Akka.OpenTelemetry;
 
 public static class OtelTags
 {

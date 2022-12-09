@@ -2,11 +2,11 @@ using Akka.Actor;
 using Akka.Actor.Internal;
 using Asynkron.Akka.Decorators;
 
-namespace Asynkron.Akka.Observable;
+namespace Asynkron.Akka.OpenTelemetry;
 
-public sealed class ObservableActorRefProvider : DecoratorActorRefProvider
+public sealed class OpenTelemetryActorRefProvider : DecoratorActorRefProvider
 {
-    public ObservableActorRefProvider(IActorRefProvider inner) : base(inner)
+    public OpenTelemetryActorRefProvider(IActorRefProvider inner) : base(inner)
     {
     }
 
@@ -15,6 +15,6 @@ public sealed class ObservableActorRefProvider : DecoratorActorRefProvider
         bool systemService, Deploy deploy, bool lookupDeploy, bool async)
     {
         var reff = base.ActorOf(system, props, supervisor, path, systemService, deploy, lookupDeploy, async);
-        return new ObservableActorRef(reff);
+        return new OpenTelemetryActorRef(reff);
     }
 }
