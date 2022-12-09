@@ -38,14 +38,14 @@ internal static class OpenTelemetryHelpers
         return activity;
     }
 
-    public static IEnumerable<KeyValuePair<string, string>> GetPropagationHeaders(this ActivityContext activityContext)
+    public static Dictionary<string, string> GetPropagationHeaders(this ActivityContext activityContext)
     {
         var context = new List<KeyValuePair<string, string>>();
 
         Propagators.DefaultTextMapPropagator.Inject(new PropagationContext(activityContext, Baggage.Current), context,
             AddHeader);
 
-        return context;
+        return context.ToDictionary(x => x.Key, x => x.Value);
     }
 
     public static PropagationContext ExtractPropagationContext(this MessageHeader headers) =>

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Akka.Actor;
 using Asynkron.Akka.Decorators;
 
@@ -11,11 +12,8 @@ public class OpenTelemetryActorRef : DecoratorActorRef
 
     public override void Tell(object message, IActorRef sender)
     {
-        //TODO: capture activity context
-        //bake into envelope message
-        //copy from Proto.Actor
-
-        var envelope = new MessageEnvelope(message, new Dictionary<string, string>());
+        var headers = Activity.Current?.Context.GetPropagationHeaders();
+        var envelope = new OpenTelemetryEnvelope(message, headers ?? Headers.Empty);
         base.Tell(envelope, sender);
     }
 }

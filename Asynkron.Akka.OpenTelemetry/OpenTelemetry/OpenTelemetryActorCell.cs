@@ -16,7 +16,7 @@ public class OpenTelemetryActorCell : DecoratorActorCell
     protected override void ReceiveMessage(object message)
     {
         //non augmented message, just pass it on
-        if (message is not MessageEnvelope envelope)
+        if (message is not OpenTelemetryEnvelope envelope)
         {
             base.ReceiveMessage(message);
             return;
