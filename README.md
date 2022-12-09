@@ -1,1 +1,1 @@
-# Asynkron.Akka.OpenTelemetry
+# Akka.OpenTelemetry

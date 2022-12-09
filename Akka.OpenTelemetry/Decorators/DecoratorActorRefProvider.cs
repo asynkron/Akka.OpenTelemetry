@@ -26,54 +26,26 @@ public abstract class DecoratorActorRefProvider : IActorRefProvider
     public virtual LocalActorRef Guardian => _inner.Guardian;
     public virtual LocalActorRef SystemGuardian => _inner.SystemGuardian;
 
-    public virtual IActorRef RootGuardianAt(Address address)
-    {
-        return _inner.RootGuardianAt(address);
-    }
+    public virtual IActorRef RootGuardianAt(Address address) => _inner.RootGuardianAt(address);
 
-    public virtual void Init(ActorSystemImpl system)
-    {
-        _inner.Init(system);
-    }
+    public virtual void Init(ActorSystemImpl system) => _inner.Init(system);
 
-    public virtual ActorPath TempPath()
-    {
-        return _inner.TempPath();
-    }
+    public virtual ActorPath TempPath() => _inner.TempPath();
 
-    public virtual void RegisterTempActor(IInternalActorRef actorRef, ActorPath path)
-    {
+    public virtual void RegisterTempActor(IInternalActorRef actorRef, ActorPath path) =>
         _inner.RegisterTempActor(actorRef, path);
-    }
 
-    public virtual void UnregisterTempActor(ActorPath path)
-    {
-        _inner.UnregisterTempActor(path);
-    }
+    public virtual void UnregisterTempActor(ActorPath path) => _inner.UnregisterTempActor(path);
 
-    public virtual FutureActorRef<T> CreateFutureRef<T>(TaskCompletionSource<T> tcs)
-    {
-        return _inner.CreateFutureRef(tcs);
-    }
+    public virtual FutureActorRef<T> CreateFutureRef<T>(TaskCompletionSource<T> tcs) => _inner.CreateFutureRef(tcs);
 
     public virtual IInternalActorRef ActorOf(ActorSystemImpl system, Props props, IInternalActorRef supervisor,
-        ActorPath path, bool systemService, Deploy deploy, bool lookupDeploy, bool async)
-    {
-        return _inner.ActorOf(system, props, supervisor, path, systemService, deploy, lookupDeploy, async);
-    }
+        ActorPath path, bool systemService, Deploy deploy, bool lookupDeploy, bool async) =>
+        _inner.ActorOf(system, props, supervisor, path, systemService, deploy, lookupDeploy, async);
 
-    public virtual IActorRef ResolveActorRef(string path)
-    {
-        return _inner.ResolveActorRef(path);
-    }
+    public virtual IActorRef ResolveActorRef(string path) => _inner.ResolveActorRef(path);
 
-    public virtual IActorRef ResolveActorRef(ActorPath actorPath)
-    {
-        return _inner.ResolveActorRef(actorPath);
-    }
+    public virtual IActorRef ResolveActorRef(ActorPath actorPath) => _inner.ResolveActorRef(actorPath);
 
-    public virtual Address GetExternalAddressFor(Address address)
-    {
-        return _inner.GetExternalAddressFor(address);
-    }
+    public virtual Address GetExternalAddressFor(Address address) => _inner.GetExternalAddressFor(address);
 }

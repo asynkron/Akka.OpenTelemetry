@@ -11,14 +11,14 @@ public abstract class DecoratorActorCell : ActorCell
     {
     }
 
-    public override IActorRef ActorOf(Props props, string? name = null)
-    {
-        var res = base.ActorOf(props, name);
-        if (res is ActorRefWithCell cell)
-        {
-            //TODO: in a galaxy far far away, a long time ago, I knew this shit
-        }
-
-        return res;
-    }
+    // public override IActorRef ActorOf(Props props, string? name = null)
+    // {
+    //     var res = base.ActorOf(props, name);
+    //     if (res is ActorRefWithCell cell)
+    //     {
+    //         //TODO: in a galaxy far far away, a long time ago, I knew this shit
+    //     }
+    //
+    //     return res;
+    // }
 }
