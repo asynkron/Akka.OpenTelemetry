@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Asynkron.Akka.OpenTelemetry", "Asynkron.Akka.OpenTelemetry\Asynkron.Akka.OpenTelemetry.csproj", "{966826A5-FAFB-4533-81DB-42908E083307}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.OpenTelemetry", "Akka.OpenTelemetry\Akka.OpenTelemetry.csproj", "{966826A5-FAFB-4533-81DB-42908E083307}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".meta", ".meta", "{30264F95-2484-4A27-B341-37C487C8D13E}"
 	ProjectSection(SolutionItems) = preProject
