@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Asynkron.Akka.Observable", "Asynkron.Akka.Observable\Asynkron.Akka.Observable.csproj", "{966826A5-FAFB-4533-81DB-42908E083307}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Asynkron.Akka.OpenTelemetry", "Asynkron.Akka.OpenTelemetry\Asynkron.Akka.OpenTelemetry.csproj", "{966826A5-FAFB-4533-81DB-42908E083307}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
