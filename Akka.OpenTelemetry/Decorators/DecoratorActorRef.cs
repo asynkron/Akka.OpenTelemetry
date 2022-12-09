@@ -7,10 +7,16 @@ namespace Asynkron.Akka.Decorators;
 public abstract class DecoratorActorRef : IInternalActorRef
 {
     private readonly IInternalActorRef _inner;
+    private ICell? _cell;
 
     protected DecoratorActorRef(IInternalActorRef inner)
     {
         _inner = inner;
+        _cell = _inner switch
+        {
+            ActorRefWithCell withCell => withCell.Underlying,
+            _ => null
+        };
     }
 
     public virtual void Tell(object message, IActorRef sender)

@@ -12,6 +12,7 @@ public class OpenTelemetryActorRef : DecoratorActorRef
 
     public override void Tell(object message, IActorRef sender)
     {
+        //TODO: probably have to exclude a lot of control messages here?
         var headers = Activity.Current?.Context.GetPropagationHeaders();
         var envelope = new OpenTelemetryEnvelope(message, headers ?? Headers.Empty);
         base.Tell(envelope, sender);

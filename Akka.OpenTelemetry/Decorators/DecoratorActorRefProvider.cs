@@ -6,9 +6,10 @@ namespace Asynkron.Akka.Decorators;
 
 public abstract class DecoratorActorRefProvider : IActorRefProvider
 {
-    private readonly IActorRefProvider _inner;
+    private IActorRefProvider _inner = null!;
 
-    protected DecoratorActorRefProvider(IActorRefProvider inner)
+
+    protected void Init(IActorRefProvider inner)
     {
         _inner = inner;
     }

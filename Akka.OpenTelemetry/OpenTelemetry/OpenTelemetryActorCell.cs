@@ -13,6 +13,7 @@ public class OpenTelemetryActorCell : DecoratorActorCell
     {
     }
 
+    private OpenTelemetryEnvelope? _currentEnvelope;
     protected override void ReceiveMessage(object message)
     {
         //non augmented message, just pass it on
@@ -21,6 +22,8 @@ public class OpenTelemetryActorCell : DecoratorActorCell
             base.ReceiveMessage(message);
             return;
         }
+
+        _currentEnvelope = envelope;
 
         var propagationContext = envelope.Headers.ExtractPropagationContext();
 
