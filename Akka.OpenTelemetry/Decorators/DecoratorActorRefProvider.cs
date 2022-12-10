@@ -4,15 +4,17 @@ using Akka.Serialization;
 
 namespace Akka.Decorators;
 
-public abstract class DecoratorActorRefProvider : IActorRefProvider
+public abstract class DecoratorActorRefProvider<TArp> : IActorRefProvider where TArp :IActorRefProvider
 {
-    protected IActorRefProvider _inner = null!;
+    protected TArp _inner;
 
 
-    protected void SetInner(IActorRefProvider inner)
+    protected void SetInner(TArp inner)
     {
         _inner = inner;
     }
+
+    protected TArp Inner => _inner;
 
     public virtual IActorRef DeadLetters => _inner.DeadLetters;
     public virtual IActorRef IgnoreRef => _inner.IgnoreRef;

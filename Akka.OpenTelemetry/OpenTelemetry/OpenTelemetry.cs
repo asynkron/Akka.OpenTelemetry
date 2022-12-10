@@ -1,15 +1,16 @@
 using Akka.Actor;
+using Akka.OpenTelemetry.Local;
 
 namespace Akka.OpenTelemetry;
 
 internal sealed class OpenTelemetry : IExtension
 {
-    public OpenTelemetry(OpenTelemetryActorRefProvider provider)
+    public OpenTelemetry(OpenTelemetryLocalActorRefProvider provider)
     {
         Provider = provider;
     }
 
-    public OpenTelemetryActorRefProvider Provider { get; }
+    public OpenTelemetryLocalActorRefProvider Provider { get; }
 
     public static OpenTelemetry For(ActorSystem system)
     {

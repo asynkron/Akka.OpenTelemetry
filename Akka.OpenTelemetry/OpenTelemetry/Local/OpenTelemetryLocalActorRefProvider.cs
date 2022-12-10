@@ -4,20 +4,19 @@ using Akka.Actor.Internal;
 using Akka.Configuration;
 using Akka.Decorators;
 using Akka.Event;
-using Akka.OpenTelemetry.ActorRefs;
+using Akka.OpenTelemetry.Local.ActorRefs;
 using JetBrains.Annotations;
 
-namespace Akka.OpenTelemetry;
+namespace Akka.OpenTelemetry.Local;
 
 [UsedImplicitly]
-public sealed class OpenTelemetryActorRefProvider : DecoratorActorRefProvider
+public sealed class OpenTelemetryLocalActorRefProvider : DecoratorActorRefProvider<LocalActorRefProvider>
 {
     private ActorSystemImpl _system = null!;
 
-    public OpenTelemetryActorRefProvider(string systemName, Settings settings, EventStream eventStream)
+    public OpenTelemetryLocalActorRefProvider(string systemName, Settings settings, EventStream eventStream)
     {
-        _inner = new LocalActorRefProvider(systemName, settings, eventStream);
-        SetInner(_inner);
+        SetInner(new LocalActorRefProvider(systemName, settings, eventStream));
     }
 
     public override void Init(ActorSystemImpl system)

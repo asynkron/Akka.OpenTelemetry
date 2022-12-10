@@ -21,7 +21,7 @@ public static class TypeExtensions
     {
         var bootstrap = self.WithConfig(
             ConfigurationFactory.ParseString("""
-akka.actor.provider = "Akka.OpenTelemetry.OpenTelemetryActorRefProvider, Akka.OpenTelemetry"
+akka.actor.provider = "Akka.OpenTelemetry.Local.OpenTelemetryLocalActorRefProvider, Akka.OpenTelemetry"
 """));
 
         return bootstrap;

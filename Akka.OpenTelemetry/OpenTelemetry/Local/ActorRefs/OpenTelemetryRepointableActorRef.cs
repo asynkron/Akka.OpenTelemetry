@@ -3,7 +3,7 @@ using Akka.Actor;
 using Akka.Actor.Internal;
 using Akka.Dispatch;
 
-namespace Akka.OpenTelemetry.ActorRefs;
+namespace Akka.OpenTelemetry.Local.ActorRefs;
 
 public class OpenTelemetryRepointableActorRef : RepointableActorRef
 {
