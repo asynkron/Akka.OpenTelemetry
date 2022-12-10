@@ -3,24 +3,15 @@ using Akka.Actor;
 using Akka.Actor.Internal;
 using Akka.Dispatch;
 
-namespace Akka.OpenTelemetry;
+namespace Akka.OpenTelemetry.ActorRefs;
 
-public class OpenTelemetryRepointableActorRef : RepointableActorRef
+public class OpenTelemetryActorRef : LocalActorRef
 {
     private readonly OpenTelemetrySettings _settings;
-    private readonly MailboxType _mainboxType;
 
-    public OpenTelemetryRepointableActorRef(OpenTelemetrySettings settings, ActorSystemImpl system, Props props, MessageDispatcher dispatcher, MailboxType mailboxType, IInternalActorRef supervisor, ActorPath path) : base(system, props, dispatcher, mailboxType, supervisor, path)
+    public OpenTelemetryActorRef(OpenTelemetrySettings settings, ActorSystemImpl system, Props props, MessageDispatcher dispatcher, MailboxType mailboxType, IInternalActorRef supervisor, ActorPath path) : base(system, props, dispatcher, mailboxType, supervisor, path)
     {
         _settings = settings;
-        _mainboxType = mailboxType;
-    }
-
-    protected override ActorCell NewCell()
-    {
-        var actorCell = new OpenTelemetryActorCell(_settings, System, this, Props, Dispatcher, Supervisor);
-        actorCell.Init(false, _mainboxType);
-        return actorCell;
     }
 
     protected override void TellInternal(object message, IActorRef sender)
@@ -34,5 +25,11 @@ public class OpenTelemetryRepointableActorRef : RepointableActorRef
         var headers = Activity.Current?.Context.GetPropagationHeaders();
         var envelope = new OpenTelemetryEnvelope(message, headers ?? Headers.Empty);
         base.TellInternal(envelope, sender);
+    }
+
+    protected override ActorCell NewActorCell(ActorSystemImpl system, IInternalActorRef self, Props props, MessageDispatcher dispatcher,
+        IInternalActorRef supervisor)
+    {
+        return new OpenTelemetryActorCell(_settings, system, self, props, dispatcher, supervisor);
     }
 }

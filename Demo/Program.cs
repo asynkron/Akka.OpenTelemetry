@@ -2,6 +2,7 @@
 using Akka;
 using Akka.Actor;
 using Akka.OpenTelemetry;
+using Demo;
 using OpenTelemetry;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -40,13 +41,16 @@ tracerProvider!.ForceFlush();
 Console.ReadLine();
 
 
-class MyActor : UntypedActor
+namespace Demo
 {
-    protected override void OnReceive(object message)
+    class MyActor : UntypedActor
     {
-        if (message is string s)
+        protected override void OnReceive(object message)
         {
-            Console.WriteLine("Got message string: " + s);
+            if (message is string s)
+            {
+                Console.WriteLine("Got message string: " + s);
+            }
         }
     }
 }

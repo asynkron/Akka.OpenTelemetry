@@ -3,6 +3,7 @@ using Akka.Actor.Internal;
 using Akka.Configuration;
 using Akka.Decorators;
 using Akka.Event;
+using Akka.OpenTelemetry.ActorRefs;
 using JetBrains.Annotations;
 
 namespace Akka.OpenTelemetry;
