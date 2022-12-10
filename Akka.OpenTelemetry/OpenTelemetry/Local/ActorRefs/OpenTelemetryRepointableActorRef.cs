@@ -2,6 +2,7 @@ using System.Diagnostics;
 using Akka.Actor;
 using Akka.Actor.Internal;
 using Akka.Dispatch;
+using Akka.OpenTelemetry.Cell;
 
 namespace Akka.OpenTelemetry.Local.ActorRefs;
 
@@ -25,15 +26,9 @@ public class OpenTelemetryRepointableActorRef : RepointableActorRef
 
     protected override void TellInternal(object message, IActorRef sender)
     {
-        var actorRefTag = Activity.Current?.GetTagItem(OtelTags.ActorRef)?.ToString() ?? "NoSender";
-
-        using var activity = OpenTelemetryHelpers.BuildStartedActivity(Activity.Current.Context, actorRefTag, "Tell", message,
-            OpenTelemetryHelpers.DefaultSetupActivity);
-        Activity.Current.AddTag(OtelTags.ActorType, Props.Type.Name);
-
-        //TODO: probably have to exclude a lot of control messages here?
-        var headers = Activity.Current?.Context.GetPropagationHeaders();
-        var envelope = new OpenTelemetryEnvelope(message, headers ?? Headers.Empty);
+        var envelope = TraceTell.TellInternal(message, Props);
         base.TellInternal(envelope, sender);
     }
+
+
 }

@@ -34,7 +34,8 @@ using (var activity =source.StartActivity("demo", ActivityKind.Client))
     reff.Tell("Testing2");
     reff.Tell("Testing3");
 
-    Console.ReadLine();
+    reff.Tell(PoisonPill.Instance);
+    await Task.Delay(100);
 }
 
 tracerProvider!.ForceFlush();

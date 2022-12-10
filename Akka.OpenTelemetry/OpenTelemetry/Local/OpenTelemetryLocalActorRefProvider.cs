@@ -22,7 +22,7 @@ public sealed class OpenTelemetryLocalActorRefProvider : DecoratorActorRefProvid
     public override void Init(ActorSystemImpl system)
     {
         _system = system;
-        _inner.Init(system);
+        Inner.Init(system);
     }
 
     public override IInternalActorRef ActorOf(ActorSystemImpl system, Props props, IInternalActorRef supervisor,
@@ -62,7 +62,7 @@ public sealed class OpenTelemetryLocalActorRefProvider : DecoratorActorRefProvid
             var dispatcher = _system.Dispatchers.Lookup(props.Dispatcher);
             var mailboxType = _system.Mailboxes.GetMailboxType(props, dispatcher.Configurator.Config);
 
-            var settings = new OpenTelemetrySettings(true, Activity.Current.Id);
+            var settings = new OpenTelemetrySettings(true, Activity.Current?.Id);
             return async switch
             {
                 true => new OpenTelemetryRepointableActorRef(settings, system, props2, dispatcher, mailboxType, supervisor, path).Initialize(async),

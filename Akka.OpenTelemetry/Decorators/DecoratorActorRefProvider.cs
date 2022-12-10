@@ -6,7 +6,7 @@ namespace Akka.Decorators;
 
 public abstract class DecoratorActorRefProvider<TArp> : IActorRefProvider where TArp :IActorRefProvider
 {
-    protected TArp _inner;
+    private TArp _inner = default!;
 
 
     protected void SetInner(TArp inner)

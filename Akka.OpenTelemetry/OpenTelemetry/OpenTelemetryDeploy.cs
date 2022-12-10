@@ -4,7 +4,7 @@ namespace Akka.OpenTelemetry;
 
 public class OpenTelemetryDeploy : Deploy
 {
-    private readonly Deploy _fallback;
+    private readonly Deploy _fallback = null!;
 
     public OpenTelemetryDeploy()
     {
