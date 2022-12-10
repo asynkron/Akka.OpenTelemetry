@@ -4,7 +4,7 @@ using OpenTelemetry;
 using OpenTelemetry.Context.Propagation;
 using MessageHeader = System.Collections.Generic.Dictionary<string,string>;
 
-namespace Asynkron.Akka.OpenTelemetry;
+namespace Akka.OpenTelemetry;
 
 internal static class OpenTelemetryHelpers
 {

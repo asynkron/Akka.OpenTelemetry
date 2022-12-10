@@ -1,12 +1,12 @@
 using System.Diagnostics;
 using Akka.Actor;
 using Akka.Actor.Internal;
+using Akka.Decorators;
 using Akka.Dispatch;
-using Asynkron.Akka.Decorators;
 
-namespace Asynkron.Akka.OpenTelemetry;
+namespace Akka.OpenTelemetry;
 
-public class OpenTelemetryActorCell : DecoratorActorCell
+public class OpenTelemetryActorCell : ActorCell
 {
     public OpenTelemetryActorCell(ActorSystemImpl system, IInternalActorRef self, Props props,
         MessageDispatcher dispatcher, IInternalActorRef parent) : base(system, self, props, dispatcher, parent)

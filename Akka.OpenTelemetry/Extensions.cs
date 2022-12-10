@@ -1,4 +1,7 @@
-namespace Asynkron.Akka;
+using Akka.Actor;
+using Akka.OpenTelemetry;
+
+namespace Akka;
 
 public static class TypeExtensions
 {
@@ -6,4 +9,6 @@ public static class TypeExtensions
     {
         return message?.GetType().Name ?? "null";
     }
+
+    public static Props WithTracing(this Props self) => self.WithDeploy(new OpenTelemetryDeploy());
 }

@@ -1,4 +1,4 @@
-namespace Asynkron.Akka.OpenTelemetry;
+namespace Akka.OpenTelemetry;
 
 public static class Headers
 {

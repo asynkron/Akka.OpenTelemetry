@@ -2,14 +2,14 @@ using Akka.Actor;
 using Akka.Actor.Internal;
 using Akka.Serialization;
 
-namespace Asynkron.Akka.Decorators;
+namespace Akka.Decorators;
 
 public abstract class DecoratorActorRefProvider : IActorRefProvider
 {
-    private IActorRefProvider _inner = null!;
+    protected IActorRefProvider _inner = null!;
 
 
-    protected void Init(IActorRefProvider inner)
+    protected void SetInner(IActorRefProvider inner)
     {
         _inner = inner;
     }

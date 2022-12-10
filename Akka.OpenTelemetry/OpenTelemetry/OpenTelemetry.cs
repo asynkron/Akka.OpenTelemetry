@@ -1,6 +1,6 @@
 using Akka.Actor;
 
-namespace Asynkron.Akka.OpenTelemetry;
+namespace Akka.OpenTelemetry;
 
 internal sealed class OpenTelemetry : IExtension
 {
