@@ -27,11 +27,11 @@ var tracerProvider = Sdk.CreateTracerProviderBuilder()
     })
     .Build();
     
-    
-    //augment config with OpenTelemetry settings
-    var bootstrap = BootstrapSetup.Create().WithOpenTelemetry();
-    var system = ActorSystem.Create("my-system", bootstrap);
-    //create props with tracing enabled
-    var props = Props.Create<MyActor>().WithTracing(); //this will likely change
-    var reff = system.ActorOf(props);
+
+//augment config with OpenTelemetry settings
+var bootstrap = BootstrapSetup.Create().WithOpenTelemetry();
+var system = ActorSystem.Create("my-system", bootstrap);
+//create props with tracing enabled
+var props = Props.Create<MyActor>().WithTracing(); //this will likely change
+var reff = system.ActorOf(props);
 ```
