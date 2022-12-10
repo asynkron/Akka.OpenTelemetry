@@ -25,6 +25,11 @@ public sealed class OpenTelemetryActorRefProvider : DecoratorActorRefProvider
         ActorPath path,
         bool systemService, Deploy deploy, bool lookupDeploy, bool async)
     {
+        if (systemService)
+        {
+            return base.ActorOf(system, props, supervisor, path, systemService, deploy, lookupDeploy, async);
+        }
+
         //vanilla stuff, just pass through to local actor ref provider
         if (props.Deploy is not OpenTelemetryDeploy otelDep)
         {
