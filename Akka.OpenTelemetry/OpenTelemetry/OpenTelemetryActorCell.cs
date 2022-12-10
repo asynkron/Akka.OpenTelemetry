@@ -1,18 +1,22 @@
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using Akka.Actor;
 using Akka.Actor.Internal;
 using Akka.Dispatch;
+using Akka.Dispatch.SysMsg;
 
 namespace Akka.OpenTelemetry;
 
 public class OpenTelemetryActorCell : ActorCell
 {
     private readonly OpenTelemetrySettings _openTelemetrySettings;
+    private string _parentSpanId;
 
     public OpenTelemetryActorCell(OpenTelemetrySettings openTelemetrySettings,  ActorSystemImpl system, IInternalActorRef self, Props props,
         MessageDispatcher dispatcher, IInternalActorRef parent) : base(system, self, props, dispatcher, parent)
     {
         _openTelemetrySettings = openTelemetrySettings;
+        _parentSpanId = _openTelemetrySettings.ParentId;
     }
 
     private OpenTelemetryEnvelope? _currentEnvelope;
@@ -29,6 +33,15 @@ public class OpenTelemetryActorCell : ActorCell
 
         if (_openTelemetrySettings.EnableTracing)
         {
+            if (Activity.Current != null)
+            {
+                _parentSpanId = Activity.Current.Id;
+            }
+            else
+            {
+                _parentSpanId = _openTelemetrySettings.ParentId;
+            }
+
             var propagationContext = envelope.Headers.ExtractPropagationContext();
 
             var actorType = Actor.ToString();
@@ -51,9 +64,44 @@ public class OpenTelemetryActorCell : ActorCell
 
     void ReceiveActivitySetup(Activity? activity, object message)
     {
-        activity?.SetTag(OtelTags.ActorType, Actor.ToString())
+        activity?.SetTag(OtelTags.ActorType, Props.Type.Name)
             .SetTag(OtelTags.MessageType, message.GetTypeName())
             .SetTag(OtelTags.ActorRef, Self.ToString())
             .SetTag(OtelTags.SenderActorRef, Sender.ToString());
+    }
+
+    protected override void PreStart()
+    {
+        using var activity = OpenTelemetryHelpers.ActivitySource.StartActivity(nameof(PreStart), ActivityKind.Server, _parentSpanId);
+        AddEvent(activity);
+        base.PreStart();
+    }
+
+    public override void Start()
+    {
+        using var activity = OpenTelemetryHelpers.ActivitySource.StartActivity(nameof(Start), ActivityKind.Server, _parentSpanId);
+        AddEvent(activity);
+        base.Start();
+    }
+
+    // protected override ActorBase CreateNewActorInstance()
+    // {
+    //     using var activity = OpenTelemetryHelpers.ActivitySource.StartActivity(nameof(CreateNewActorInstance), ActivityKind.Server, _parentSpanId);
+    //     AddEvent(activity);
+    //     var res = base.CreateNewActorInstance();
+    //     return res;
+    // }
+
+    private void AddEvent(Activity? activity,[CallerMemberName]string callerName ="")
+    {
+        activity?.AddEvent(new ActivityEvent(callerName));
+        activity?.AddTag(OtelTags.ActorType, Props.Type.Name);
+    }
+
+    protected override void AutoReceiveMessage(Envelope envelope)
+    {
+        using var activity = OpenTelemetryHelpers.ActivitySource.StartActivity(nameof(AutoReceiveMessage), ActivityKind.Server, _parentSpanId);
+        AddEvent(activity);
+        base.AutoReceiveMessage(envelope);
     }
 }

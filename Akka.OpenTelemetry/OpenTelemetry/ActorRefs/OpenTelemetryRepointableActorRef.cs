@@ -25,10 +25,11 @@ public class OpenTelemetryRepointableActorRef : RepointableActorRef
 
     protected override void TellInternal(object message, IActorRef sender)
     {
-        var actorRefTag = Activity.Current?.GetTagItem(OtelTags.ActorRef)?.ToString() ?? "none";
+        var actorRefTag = Activity.Current?.GetTagItem(OtelTags.ActorRef)?.ToString() ?? "NoSender";
 
         using var activity = OpenTelemetryHelpers.BuildStartedActivity(Activity.Current.Context, actorRefTag, "Tell", message,
             OpenTelemetryHelpers.DefaultSetupActivity);
+        Activity.Current.AddTag(OtelTags.ActorType, Props.Type.Name);
 
         //TODO: probably have to exclude a lot of control messages here?
         var headers = Activity.Current?.Context.GetPropagationHeaders();

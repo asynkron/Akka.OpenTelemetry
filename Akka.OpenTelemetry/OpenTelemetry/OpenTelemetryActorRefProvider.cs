@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Akka.Actor;
 using Akka.Actor.Internal;
 using Akka.Configuration;
@@ -62,11 +63,11 @@ public sealed class OpenTelemetryActorRefProvider : DecoratorActorRefProvider
             var dispatcher = _system.Dispatchers.Lookup(props.Dispatcher);
             var mailboxType = _system.Mailboxes.GetMailboxType(props, dispatcher.Configurator.Config);
 
-            var settings = new OpenTelemetrySettings(true);
+            var settings = new OpenTelemetrySettings(true, Activity.Current.Id);
             return async switch
             {
                 true => new OpenTelemetryRepointableActorRef(settings, system, props2, dispatcher, mailboxType, supervisor, path).Initialize(async),
-                _ => new OpenTelemetryActorRef(settings, system, props, dispatcher, mailboxType, supervisor, path)
+                _ => new OpenTelemetryLocalActorRef(settings, system, props, dispatcher, mailboxType, supervisor, path)
             };
         }
         catch (Exception ex)
