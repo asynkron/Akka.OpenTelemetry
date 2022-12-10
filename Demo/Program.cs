@@ -30,6 +30,7 @@ using (var activity =source.StartActivity("demo", ActivityKind.Client))
     var props = Props.Create<MyActor>().WithTracing();
     var reff = system.ActorOf(props);
 
+    reff.Tell(new SpawnChild());
     reff.Tell("Testing");
     reff.Tell("Testing2");
     reff.Tell("Testing3");
@@ -44,13 +45,41 @@ Console.ReadLine();
 
 namespace Demo
 {
+    record SpawnChild();
+
     class MyActor : UntypedActor
     {
         protected override void OnReceive(object message)
         {
-            if (message is string s)
+            switch (message)
             {
-                Console.WriteLine("Got message string: " + s);
+                case SpawnChild:
+                {
+                    var childProps = Props.Create<MyChildActor>().WithTracing();
+                    var reff = Context.ActorOf(childProps);
+                    reff.Tell("hello");
+                    break;
+                }
+                case string s:
+                    Console.WriteLine("Got message string: " + s);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    class MyChildActor : UntypedActor
+    {
+        protected override void OnReceive(object message)
+        {
+            switch (message)
+            {
+                case string s:
+                    Console.WriteLine("Got message string: " + s);
+                    break;
+                default:
+                    break;
             }
         }
     }
