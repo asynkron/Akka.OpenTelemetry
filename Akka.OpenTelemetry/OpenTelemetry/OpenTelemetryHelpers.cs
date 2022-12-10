@@ -6,9 +6,9 @@ using MessageHeader = System.Collections.Generic.Dictionary<string,string>;
 
 namespace Akka.OpenTelemetry;
 
-internal static class OpenTelemetryHelpers
+public static class OpenTelemetryHelpers
 {
-    private static readonly ActivitySource ActivitySource = new(OtelTags.ActivitySourceName);
+    public static readonly ActivitySource ActivitySource = new(OtelTags.ActivitySourceName);
 
     public static void DefaultSetupActivity(Activity _, object __)
     {
@@ -24,7 +24,7 @@ internal static class OpenTelemetryHelpers
         ActivityKind activityKind = ActivityKind.Internal
     )
     {
-        var messageType = message.GetMessageTypeName();
+        var messageType = message.GetTypeName();
 
         var name = $"Akka {source}.{verb} {messageType}";
         var tags = new[] { new KeyValuePair<string, object?>(OtelTags.MessageType, messageType) };

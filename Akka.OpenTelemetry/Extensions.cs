@@ -9,7 +9,7 @@ public static class TypeExtensions
     public static TracerProviderBuilder AddAkkaInstrumentation(this TracerProviderBuilder builder) =>
         builder.AddSource(OtelTags.ActivitySourceName);
 
-    public static string GetMessageTypeName(this object? message)
+    public static string GetTypeName(this object? message)
     {
         return message?.GetType().Name ?? "null";
     }

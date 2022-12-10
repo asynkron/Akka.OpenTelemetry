@@ -19,6 +19,13 @@ public class OpenTelemetryActorRef : LocalActorRef
             base.TellInternal(message,sender);
             return;
         }
+
+
+        var actorRefTag = Activity.Current?.GetTagItem(OtelTags.ActorRef)?.ToString() ?? "none";
+
+        using var activity = OpenTelemetryHelpers.BuildStartedActivity(Activity.Current.Context, actorRefTag, "Tell", message,
+            OpenTelemetryHelpers.DefaultSetupActivity);
+
         //TODO: probably have to exclude a lot of control messages here?
         var headers = Activity.Current?.Context.GetPropagationHeaders();
         var envelope = new OpenTelemetryEnvelope(message, headers ?? Headers.Empty);

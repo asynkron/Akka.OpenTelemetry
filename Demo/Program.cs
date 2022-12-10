@@ -1,16 +1,15 @@
-﻿using Akka;
+﻿using System.Diagnostics;
+using Akka;
 using Akka.Actor;
 using Akka.Configuration;
+using Akka.OpenTelemetry;
 using OpenTelemetry;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
-
-var builder = ResourceBuilder.CreateDefault();
-
 var tracerProvider = Sdk.CreateTracerProviderBuilder()
-    .SetResourceBuilder(builder
-        .AddService("Proto.Cluster.Tests")
+    .SetResourceBuilder(ResourceBuilder.CreateDefault()
+        .AddService("Akka.OpenTelemetry.Demo")
     )
     .AddAkkaInstrumentation()
     .AddOtlpExporter(options =>
@@ -20,22 +19,29 @@ var tracerProvider = Sdk.CreateTracerProviderBuilder()
     })
     .Build();
 
+var source = OpenTelemetryHelpers.ActivitySource;
+using (var activity =source.StartActivity("demo", ActivityKind.Client))
+{
+    activity?.SetTag("demo", "true");
 
-var bootstrap = BootstrapSetup.Create().WithConfig(
-    ConfigurationFactory.ParseString("""
+    var bootstrap = BootstrapSetup.Create().WithConfig(
+        ConfigurationFactory.ParseString("""
 akka.actor.provider = "Akka.OpenTelemetry.OpenTelemetryActorRefProvider, Akka.OpenTelemetry"
 """));
 
-var system = ActorSystem.Create("my-system", bootstrap);
-var props = Props.Create<MyActor>().WithTracing();
-var reff = system.ActorOf(props);
+    var system = ActorSystem.Create("my-system", bootstrap);
+    var props = Props.Create<MyActor>().WithTracing();
+    var reff = system.ActorOf(props);
 
-reff.Tell("Testing");
+    reff.Tell("Testing");
+    reff.Tell("Testing2");
+    reff.Tell("Testing3");
 
+    Console.ReadLine();
+}
+
+tracerProvider.ForceFlush();
 Console.ReadLine();
-
-
-
 
 
 class MyActor : UntypedActor
