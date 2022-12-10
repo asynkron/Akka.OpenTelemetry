@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using Akka.Actor;
 using Akka.Actor.Internal;
-using Akka.Decorators;
 using Akka.Dispatch;
 
 namespace Akka.OpenTelemetry;

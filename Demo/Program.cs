@@ -1,10 +1,25 @@
-﻿// See https://aka.ms/new-console-template for more information
-
-// create a new actor system
-
-using Akka;
+﻿using Akka;
 using Akka.Actor;
 using Akka.Configuration;
+using OpenTelemetry;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
+
+
+var builder = ResourceBuilder.CreateDefault();
+
+var tracerProvider = Sdk.CreateTracerProviderBuilder()
+    .SetResourceBuilder(builder
+        .AddService("Proto.Cluster.Tests")
+    )
+    .AddAkkaInstrumentation()
+    .AddOtlpExporter(options =>
+    {
+        options.Endpoint = new Uri("http://localhost:4317");
+        options.ExportProcessorType = ExportProcessorType.Batch;
+    })
+    .Build();
+
 
 var bootstrap = BootstrapSetup.Create().WithConfig(
     ConfigurationFactory.ParseString("""
