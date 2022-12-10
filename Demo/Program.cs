@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using Akka;
 using Akka.Actor;
-using Akka.Configuration;
 using Akka.OpenTelemetry;
 using OpenTelemetry;
 using OpenTelemetry.Resources;
@@ -24,10 +23,7 @@ using (var activity =source.StartActivity("demo", ActivityKind.Client))
 {
     activity?.SetTag("demo", "true");
 
-    var bootstrap = BootstrapSetup.Create().WithConfig(
-        ConfigurationFactory.ParseString("""
-akka.actor.provider = "Akka.OpenTelemetry.OpenTelemetryActorRefProvider, Akka.OpenTelemetry"
-"""));
+    var bootstrap = BootstrapSetup.Create().WithOpenTelemetry();
 
     var system = ActorSystem.Create("my-system", bootstrap);
     var props = Props.Create<MyActor>().WithTracing();
@@ -40,7 +36,7 @@ akka.actor.provider = "Akka.OpenTelemetry.OpenTelemetryActorRefProvider, Akka.Op
     Console.ReadLine();
 }
 
-tracerProvider.ForceFlush();
+tracerProvider!.ForceFlush();
 Console.ReadLine();
 
 

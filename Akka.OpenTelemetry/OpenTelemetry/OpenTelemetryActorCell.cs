@@ -26,7 +26,7 @@ public class OpenTelemetryActorCell : ActorCell
 
         var propagationContext = envelope.Headers.ExtractPropagationContext();
 
-        var actorType = Actor.GetType().GetTypeName();
+        var actorType = Actor.ToString();
         using var activity =
             OpenTelemetryHelpers.BuildStartedActivity(propagationContext.ActivityContext, actorType,
                 nameof(ReceiveMessage),
@@ -37,6 +37,7 @@ public class OpenTelemetryActorCell : ActorCell
 
     void ReceiveActivitySetup(Activity activity, object message)
     {
+        activity?.SetTag(OtelTags.ActorType, Actor.ToString());
         activity?.SetTag(OtelTags.MessageType, message.GetTypeName());
         activity?.SetTag(OtelTags.ActorRef, Self.ToString());
         activity?.SetTag(OtelTags.SenderActorRef, Sender.ToString());

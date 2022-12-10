@@ -1,4 +1,5 @@
 using Akka.Actor;
+using Akka.Configuration;
 using Akka.OpenTelemetry;
 using OpenTelemetry.Trace;
 
@@ -15,4 +16,14 @@ public static class TypeExtensions
     }
 
     public static Props WithTracing(this Props self) => self.WithDeploy(new OpenTelemetryDeploy());
+
+    public static BootstrapSetup WithOpenTelemetry(this BootstrapSetup self)
+    {
+        var bootstrap = self.WithConfig(
+            ConfigurationFactory.ParseString("""
+akka.actor.provider = "Akka.OpenTelemetry.OpenTelemetryActorRefProvider, Akka.OpenTelemetry"
+"""));
+
+        return bootstrap;
+    }
 }
