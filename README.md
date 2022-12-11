@@ -1,7 +1,7 @@
 # Akka.OpenTelemetry
 
 This is a library that provides OpenTelemetry instrumentation for Akka.NET.
-Status is very much work in progress.
+Status is work in progress.
 
 Tracing currently works for:
 
@@ -14,6 +14,14 @@ And where it doesn't work:
 * Cluster Actors
 * Remote Deployed Actors
 * Async-Await, no tracing context is stored between async/await calls
+
+Akka.OpenTelemetry has been tested with Asynkron TraceView
+
+[Asynkron TraceView](https://github.com/asynkron/TraceViewDeploy)
+
+<img src="images/sequence.png" alt="sequence diagram showing Akka.NET chat application with tracing">
+
+<img src="images/component.png" alt="component diagram showing Akka.NET chat application with tracing">
 
 There are currently no configuration support, all actors in `/user/`-space are traced.
 

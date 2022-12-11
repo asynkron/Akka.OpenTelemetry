@@ -18,6 +18,7 @@
         <PackageTags>akka; actors; opentelemetry; distributed tracing;</PackageTags>
         <PackageProjectUrl>https://github.com/asynkron/Akka.OpenTelemetry</PackageProjectUrl>
         <PackageIcon>asynkron.png</PackageIcon>
+        <PackageLicenseUrl>https://raw.githubusercontent.com/asynkron/Akka.OpenTelemetry/main/LICENSE</PackageLicenseUrl>
     </PropertyGroup>
 
     <ItemGroup>
