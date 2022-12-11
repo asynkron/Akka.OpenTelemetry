@@ -44,6 +44,7 @@ using var system = ActorSystem.Create("MyServer", config);
 var props = Props.Create(() => new ChatServerActor()).WithTracing();
 system.ActorOf(props, "ChatServer");
 
+tracerProvider.ForceFlush();
 Console.ReadLine();
 
 

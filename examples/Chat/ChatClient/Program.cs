@@ -76,6 +76,7 @@ while (true)
     }
 }
 
+tracerProvider.ForceFlush();
 system.Terminate().Wait();
 
 
