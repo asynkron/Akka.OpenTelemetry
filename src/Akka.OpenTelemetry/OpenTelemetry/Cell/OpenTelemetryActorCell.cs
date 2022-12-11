@@ -4,7 +4,7 @@ using Akka.Actor;
 using Akka.Actor.Internal;
 using Akka.Dispatch;
 using Akka.Dispatch.SysMsg;
-using Akka.OpenTelemetry.Local.ActorRefs;
+using Akka.OpenTelemetry.Local;
 
 namespace Akka.OpenTelemetry.Cell;
 

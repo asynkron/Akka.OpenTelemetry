@@ -2,7 +2,7 @@ using Akka.Actor;
 using Akka.Dispatch.SysMsg;
 using Akka.Util;
 
-namespace Akka.OpenTelemetry.Cell;
+namespace Akka.OpenTelemetry.Local;
 
 public class ActorSelectionAnchorActorRef : IInternalActorRef
 {
@@ -36,7 +36,9 @@ public class ActorSelectionAnchorActorRef : IInternalActorRef
     public void Stop() => _inner.Stop();
     public void Restart(Exception cause) => _inner.Restart(cause);
     public void Suspend() => _inner.Suspend();
+#pragma warning disable CS0618
     public void SendSystemMessage(ISystemMessage message, IActorRef sender) => _inner.SendSystemMessage(message, sender);
+#pragma warning restore CS0618
     public void SendSystemMessage(ISystemMessage message) => _inner.SendSystemMessage(message);
     public IInternalActorRef Parent => _inner.Parent;
     public IActorRefProvider Provider => _inner.Provider;

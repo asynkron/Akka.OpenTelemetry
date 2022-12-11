@@ -31,10 +31,10 @@ public static class TraceTell
             return new OpenTelemetryEnvelope(message, Headers.Empty);
         }
 
-        var actorRefTag = Activity.Current?.GetTagItem(OtelTags.ActorRef)?.ToString() ?? "NoSender";
+      //  var actorRefTag = Activity.Current?.GetTagItem(OtelTags.ActorRef)?.ToString() ?? "NoSender";
 
-        using var tellActivity = OpenTelemetryHelpers.BuildStartedActivity(activity.Context, actorRefTag, "Tell", message,
-            OpenTelemetryHelpers.DefaultSetupActivity);
+        // using var tellActivity = OpenTelemetryHelpers.BuildStartedActivity(activity.Context, actorRefTag, "Tell", message,
+        //     OpenTelemetryHelpers.DefaultSetupActivity);
         var headers = Activity.Current?.Context.GetPropagationHeaders();
         var envelope = new OpenTelemetryEnvelope(message, headers ?? Headers.Empty);
         return envelope;

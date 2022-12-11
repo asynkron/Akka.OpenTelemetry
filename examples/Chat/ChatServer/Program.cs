@@ -30,7 +30,7 @@ akka {
 
 var tracerProvider = Sdk.CreateTracerProviderBuilder()
     .SetResourceBuilder(ResourceBuilder.CreateDefault()
-        .AddService("Akka.OpenTelemetry.HelloWorld")
+        .AddService("ChatServerApp")
     )
     .AddAkkaInstrumentation()
     .AddOtlpExporter(options =>
