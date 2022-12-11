@@ -21,6 +21,12 @@ public class RemoteActorRefProviderDecorator : IRemoteActorRefProvider
     {
         get
         {
+            //TODO: race condition here?
+            if (Inner.DefaultAddress is null)
+            {
+                Console.WriteLine("Inner is null");
+                SpinWait.SpinUntil(() => Inner.DefaultAddress != null);
+            }
             return Inner.DefaultAddress;
         }
     }

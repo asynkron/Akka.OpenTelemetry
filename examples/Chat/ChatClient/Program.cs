@@ -5,9 +5,11 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System.Diagnostics;
 using Akka;
 using Akka.Actor;
 using Akka.Configuration;
+using Akka.OpenTelemetry;
 using ChatMessages;
 using OpenTelemetry;
 using OpenTelemetry.Resources;
@@ -42,37 +44,43 @@ var tracerProvider = Sdk.CreateTracerProviderBuilder()
 using var system = ActorSystem.Create("MyClient", config);
 var props = Props.Create(() => new ChatClientActor());
 var chatClient = system.ActorOf(props);
-chatClient.Tell(new ConnectRequest
-{
-    Username = "Roggan"
-});
 
-while (true)
+var source = OpenTelemetryHelpers.ActivitySource;
+using (var activity = source.StartActivity("demo", ActivityKind.Client))
 {
-    var input = Console.ReadLine();
-    if (input.StartsWith("/"))
+    activity?.SetTag("demo", "true");
+    chatClient.Tell(new ConnectRequest
     {
-        var parts = input.Split(' ');
-        var cmd = parts[0].ToLowerInvariant();
-        var rest = string.Join(" ", parts.Skip(1));
+        Username = "Roggan"
+    });
 
-        if (cmd == "/nick")
-            chatClient.Tell(new NickRequest
+    while (true)
+    {
+        var input = Console.ReadLine();
+        if (input.StartsWith("/"))
+        {
+            var parts = input.Split(' ');
+            var cmd = parts[0].ToLowerInvariant();
+            var rest = string.Join(" ", parts.Skip(1));
+
+            if (cmd == "/nick")
+                chatClient.Tell(new NickRequest
+                {
+                    NewUsername = rest
+                });
+            if (cmd == "/exit")
             {
-                NewUsername = rest
-            });
-        if (cmd == "/exit")
-        {
-            Console.WriteLine("exiting");
-            break;
+                Console.WriteLine("exiting");
+                break;
+            }
         }
-    }
-    else
-    {
-        chatClient.Tell(new SayRequest
+        else
         {
-            Text = input
-        });
+            chatClient.Tell(new SayRequest
+            {
+                Text = input
+            });
+        }
     }
 }
 
