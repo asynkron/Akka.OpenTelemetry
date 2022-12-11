@@ -21,7 +21,7 @@ Akka.OpenTelemetry has been tested with Asynkron TraceView
 
 <img src="images/sequence.png" alt="sequence diagram showing Akka.NET chat application with tracing">
 
-<img src="images/component.png" alt="component diagram showing Akka.NET chat application with tracing">
+<img src="images/component2.png" alt="component diagram showing Akka.NET chat application with tracing">
 
 There are currently no configuration support, all actors in `/user/`-space are traced.
 
