@@ -9,7 +9,7 @@ using OpenTelemetry.Trace;
 
 var tracerProvider = Sdk.CreateTracerProviderBuilder()
     .SetResourceBuilder(ResourceBuilder.CreateDefault()
-        .AddService("Akka.OpenTelemetry.Demo")
+        .AddService("Akka.OpenTelemetry.HelloWorld")
     )
     .AddAkkaInstrumentation()
     .AddOtlpExporter(options =>
@@ -20,7 +20,7 @@ var tracerProvider = Sdk.CreateTracerProviderBuilder()
     .Build();
 
 var source = OpenTelemetryHelpers.ActivitySource;
-using (var activity =source.StartActivity("demo", ActivityKind.Client))
+using (var activity = source.StartActivity("demo", ActivityKind.Client))
 {
     activity?.SetTag("demo", "true");
 
@@ -45,9 +45,9 @@ Console.ReadLine();
 
 namespace Demo
 {
-    record SpawnChild();
+    internal record SpawnChild;
 
-    class MyActor : UntypedActor
+    internal class MyActor : UntypedActor
     {
         protected override void OnReceive(object message)
         {
@@ -63,13 +63,11 @@ namespace Demo
                 case string s:
                     Console.WriteLine("Got message string: " + s);
                     break;
-                default:
-                    break;
             }
         }
     }
 
-    class MyChildActor : UntypedActor
+    internal class MyChildActor : UntypedActor
     {
         protected override void OnReceive(object message)
         {
@@ -77,8 +75,6 @@ namespace Demo
             {
                 case string s:
                     Console.WriteLine("Got message string: " + s);
-                    break;
-                default:
                     break;
             }
         }

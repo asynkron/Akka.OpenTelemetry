@@ -1,28 +1,28 @@
-using System.Diagnostics;
 using Akka.Actor;
 using Akka.Actor.Internal;
 using Akka.Configuration;
 using Akka.Decorators;
 using Akka.Event;
 using Akka.OpenTelemetry.Local.ActorRefs;
+using Akka.Remote;
 using JetBrains.Annotations;
 
-namespace Akka.OpenTelemetry.Local;
+namespace Akka.OpenTelemetry.Remote;
 
 [UsedImplicitly]
-public sealed class OpenTelemetryLocalActorRefProvider : DecoratorActorRefProvider<LocalActorRefProvider>
+public sealed class OpenTelemetryRemoteActorRefProvider: RemoteActorRefProviderDecorator
 {
-    private ActorSystemImpl _system = null!;
+    private ActorSystemImpl _system;
 
-    public OpenTelemetryLocalActorRefProvider(string systemName, Settings settings, EventStream eventStream)
+    public OpenTelemetryRemoteActorRefProvider(string systemName, Settings settings, EventStream eventStream)
     {
-        SetInner(new LocalActorRefProvider(systemName, settings, eventStream));
+        _remoteProvider = new RemoteActorRefProvider(systemName, settings, eventStream);
     }
 
     public override void Init(ActorSystemImpl system)
     {
         _system = system;
-        Inner.Init(system);
+        _remoteProvider.Init(system);
     }
 
     public override IInternalActorRef ActorOf(ActorSystemImpl system, Props props, IInternalActorRef supervisor,
@@ -35,7 +35,7 @@ public sealed class OpenTelemetryLocalActorRefProvider : DecoratorActorRefProvid
         }
 
         //vanilla stuff, just pass through to local actor ref provider
-        if (props.Deploy is not OpenTelemetryDeploy otelDep)
+        if (props.Deploy is not OpenTelemetryDeploy)
         {
             return base.ActorOf(system, props, supervisor, path, systemService, deploy, lookupDeploy, async);
         }

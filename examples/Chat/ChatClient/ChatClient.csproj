@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>11</LangVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Akka" Version="1.4.43"/>
+        <PackageReference Include="Akka.Remote" Version="1.4.43"/>
+        <ProjectReference Include="..\..\..\src\Akka.OpenTelemetry\Akka.OpenTelemetry.csproj"/>
+        <ProjectReference Include="..\ChatMessages\ChatMessages.csproj"/>
+    </ItemGroup>
+
+</Project>

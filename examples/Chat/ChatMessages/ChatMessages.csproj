@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>11</LangVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Folder Include="Properties\"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Akka" Version="1.4.43"/>
+        <PackageReference Include="Akka.Remote" Version="1.4.43"/>
+    </ItemGroup>
+
+</Project>
