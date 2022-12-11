@@ -60,7 +60,7 @@ public class OpenTelemetryActorCell : ActorCell
                         envelope.Message,
                         ReceiveActivitySetup);
 
-            _parentSpanId = activity.Id;
+            _parentSpanId = activity?.Id ?? "";
             //shady, yes, but we need to trigger receive timeout etc.
             Invoke(new Envelope(envelope.Message, Sender, System));
         }

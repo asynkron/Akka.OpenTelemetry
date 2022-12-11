@@ -29,18 +29,26 @@ public sealed class OpenTelemetryRemoteActorRefProvider: RemoteActorRefProviderD
         ActorPath path,
         bool systemService, Deploy deploy, bool lookupDeploy, bool async)
     {
-        if (systemService)
+        if (NotTraced(props, systemService))
         {
             return base.ActorOf(system, props, supervisor, path, systemService, deploy, lookupDeploy, async);
         }
 
-        //vanilla stuff, just pass through to local actor ref provider
-        if (props.Deploy is not OpenTelemetryDeploy)
-        {
-            return base.ActorOf(system, props, supervisor, path, systemService, deploy, lookupDeploy, async);
-        }
+        //TODO: figure out what to do with remote deployments here...
 
-        //Random copy paste from LocalActorRefProvider
+        return LocalActorOf(system, props, supervisor, path, deploy, lookupDeploy, async);
+    }
+
+    private static bool NotTraced(Props props, bool systemService)
+    {
+        return systemService || props.Deploy is not OpenTelemetryDeploy;
+    }
+
+
+    //Random copy paste from LocalActorRefProvider
+    private IInternalActorRef LocalActorOf(ActorSystemImpl system, Props props, IInternalActorRef supervisor,
+        ActorPath path, Deploy deploy, bool lookupDeploy, bool async)
+    {
         var props2 = props;
         var propsDeploy = lookupDeploy ? Deployer.Lookup(path) : deploy;
         if (propsDeploy != null)
@@ -65,7 +73,8 @@ public sealed class OpenTelemetryRemoteActorRefProvider: RemoteActorRefProviderD
             var settings = new OpenTelemetrySettings(true);
             return async switch
             {
-                true => new OpenTelemetryRepointableActorRef(settings, system, props2, dispatcher, mailboxType, supervisor, path).Initialize(async),
+                true => new OpenTelemetryRepointableActorRef(settings, system, props2, dispatcher, mailboxType, supervisor,
+                    path).Initialize(async),
                 _ => new OpenTelemetryLocalActorRef(settings, system, props, dispatcher, mailboxType, supervisor, path)
             };
         }

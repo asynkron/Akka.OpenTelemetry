@@ -5,9 +5,13 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using Akka;
 using Akka.Actor;
 using Akka.Configuration;
 using ChatMessages;
+using OpenTelemetry;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 
 var config = ConfigurationFactory.ParseString("""
 akka {
@@ -23,8 +27,21 @@ akka {
 }
 """);
 
+var tracerProvider = Sdk.CreateTracerProviderBuilder()
+    .SetResourceBuilder(ResourceBuilder.CreateDefault()
+        .AddService("Akka.OpenTelemetry.HelloWorld")
+    )
+    .AddAkkaInstrumentation()
+    .AddOtlpExporter(options =>
+    {
+        options.Endpoint = new Uri("http://localhost:4317");
+        options.ExportProcessorType = ExportProcessorType.Batch;
+    })
+    .Build();
+
 using var system = ActorSystem.Create("MyClient", config);
-var chatClient = system.ActorOf(Props.Create<ChatClientActor>());
+var props = Props.Create<ChatClientActor>().WithTracing();
+var chatClient = system.ActorOf(props);
 chatClient.Tell(new ConnectRequest
 {
     Username = "Roggan"
