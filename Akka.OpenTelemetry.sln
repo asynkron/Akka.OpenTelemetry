@@ -23,6 +23,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatServer", "examples\Chat
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatClient", "examples\Chat\ChatClient\ChatClient.csproj", "{9AB0AD9A-FE78-486E-9733-C6453D0F9552}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "images", "images", "{054129F7-6B27-4E51-A7B8-D0913532E58D}"
+	ProjectSection(SolutionItems) = preProject
+		images\component.png = images\component.png
+		images\sequence2.png = images\sequence2.png
+		images\sequence.png = images\sequence.png
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
