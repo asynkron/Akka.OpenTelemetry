@@ -11,6 +11,13 @@
         <Version>0.0.2</Version>
         <Authors>Asynkron</Authors>
         <LangVersion>11</LangVersion>
+        <Title>Akka.OpenTelemetry</Title>
+        <Description>OpenTelemetry Tracing support for Akka.NET</Description>
+        <Copyright>Asynkron AB</Copyright>
+        <RepositoryUrl>https://github.com/asynkron/Akka.OpenTelemetry</RepositoryUrl>
+        <PackageTags>akka; actors; opentelemetry; distributed tracing;</PackageTags>
+        <PackageProjectUrl>https://github.com/asynkron/Akka.OpenTelemetry</PackageProjectUrl>
+        <PackageIcon>asynkron.png</PackageIcon>
     </PropertyGroup>
 
     <ItemGroup>
@@ -20,6 +27,13 @@
         <PackageReference Include="JetBrains.Annotations" Version="2022.3.1" />
         <PackageReference Include="OpenTelemetry" Version="1.3.1" />
         <PackageReference Include="OpenTelemetry.Api" Version="1.3.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="asynkron.png">
+        <Pack>True</Pack>
+        <PackagePath></PackagePath>
+      </None>
     </ItemGroup>
 
 </Project>
