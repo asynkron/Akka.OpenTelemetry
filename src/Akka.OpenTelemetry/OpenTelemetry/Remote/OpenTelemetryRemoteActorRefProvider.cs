@@ -15,7 +15,7 @@ public sealed class OpenTelemetryRemoteActorRefProvider: RemoteActorRefProviderD
     public OpenTelemetryRemoteActorRefProvider(string systemName, Settings settings, EventStream eventStream)
     {
 
-        _inner = new RemoteActorRefProvider(systemName, settings, eventStream);
+        _inner = new RemoteActorRefProvider2(systemName, settings, eventStream);
     }
 
     public override void Init(ActorSystemImpl system)
@@ -69,18 +69,5 @@ public sealed class OpenTelemetryRemoteActorRefProvider: RemoteActorRefProviderD
             return new EmptyLocalActorRef(_system.Provider, actorRef.Path / pathElements, _system.EventStream);
         }
         return (IInternalActorRef)child;
-    }
-
-    public override IInternalActorRef ResolveActorRefWithLocalAddress(string path, Address localAddress)
-    {
-        var reff = base.ResolveActorRefWithLocalAddress(path, localAddress);
-        if (reff.Path.Elements.FirstOrDefault() == "user")
-        {
-            return reff;
-
-            //TODO: why does this break remoting?
-            return new OpenTelemetryRemoteActorRef(reff);
-        }
-       return reff;
     }
 }
