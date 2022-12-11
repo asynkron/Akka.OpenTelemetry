@@ -16,13 +16,13 @@ public class OpenTelemetryLocalActorRef : LocalActorRef
 
     protected override void TellInternal(object message, IActorRef sender)
     {
-        var envelope = TraceTell.TellInternal(message, Props);
+        var envelope = TraceTell.ExtractHeaders(message, Props);
         base.TellInternal(envelope, sender);
     }
 
     protected override ActorCell NewActorCell(ActorSystemImpl system, IInternalActorRef self, Props props, MessageDispatcher dispatcher,
         IInternalActorRef supervisor)
     {
-        return new OpenTelemetryActorCell(_settings, system, self, props, dispatcher, supervisor);
+        return new OpenTelemetryActorCell(system, self, props, dispatcher, supervisor);
     }
 }

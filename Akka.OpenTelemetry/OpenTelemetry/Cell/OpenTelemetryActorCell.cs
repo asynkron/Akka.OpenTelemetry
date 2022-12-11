@@ -12,10 +12,10 @@ public class OpenTelemetryActorCell : ActorCell
     private readonly OpenTelemetrySettings _openTelemetrySettings;
     private string _parentSpanId;
 
-    public OpenTelemetryActorCell(OpenTelemetrySettings openTelemetrySettings,  ActorSystemImpl system, IInternalActorRef self, Props props,
+    public OpenTelemetryActorCell(ActorSystemImpl system, IInternalActorRef self, Props props,
         MessageDispatcher dispatcher, IInternalActorRef parent) : base(system, self, props, dispatcher, parent)
     {
-        _openTelemetrySettings = new OpenTelemetrySettings(true, "");
+        _openTelemetrySettings = new OpenTelemetrySettings(true);
         _parentSpanId = null;
 
         // if (openTelemetrySettings == null)
@@ -46,10 +46,6 @@ public class OpenTelemetryActorCell : ActorCell
             if (Activity.Current != null)
             {
                 _parentSpanId = Activity.Current.Id!;
-            }
-            else
-            {
-                _parentSpanId = _openTelemetrySettings.ParentId!;
             }
 
             var propagationContext = envelope.Headers.ExtractPropagationContext();
@@ -138,8 +134,10 @@ public class OpenTelemetryActorCell : ActorCell
     {
         using var activity = OpenTelemetryHelpers.ActivitySource.StartActivity(nameof(ActorOf), ActivityKind.Server, _parentSpanId);
         AddEvent(activity);
-        activity?.AddEvent(new ActivityEvent("ActorOf: " + name));
-        return base.ActorOf(props, name);
+        var res = base.ActorOf(props, name);
+        activity?.AddEvent(new ActivityEvent("Spawned Child: " + res));
+
+        return res;
     }
 
     public override void SendSystemMessage(ISystemMessage systemMessage)

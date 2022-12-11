@@ -5,7 +5,7 @@ namespace Akka.OpenTelemetry;
 
 public static class TraceTell
 {
-    public static OpenTelemetryEnvelope TellInternal(object message, Props props)
+    public static OpenTelemetryEnvelope ExtractHeaders(object message, Props props)
     {
         var activity = Activity.Current;
         if (activity is null)

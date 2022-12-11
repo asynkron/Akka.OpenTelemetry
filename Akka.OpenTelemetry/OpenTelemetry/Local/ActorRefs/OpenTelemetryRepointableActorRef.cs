@@ -19,14 +19,14 @@ public class OpenTelemetryRepointableActorRef : RepointableActorRef
 
     protected override ActorCell NewCell()
     {
-        var actorCell = new OpenTelemetryActorCell(_settings, System, this, Props, Dispatcher, Supervisor);
+        var actorCell = new OpenTelemetryActorCell(System, this, Props, Dispatcher, Supervisor);
         actorCell.Init(false, _mailboxType);
         return actorCell;
     }
 
     protected override void TellInternal(object message, IActorRef sender)
     {
-        var envelope = TraceTell.TellInternal(message, Props);
+        var envelope = TraceTell.ExtractHeaders(message, Props);
         base.TellInternal(envelope, sender);
     }
 
