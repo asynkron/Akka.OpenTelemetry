@@ -1,10 +1,23 @@
 # Akka.OpenTelemetry
 
 This is a library that provides OpenTelemetry instrumentation for Akka.NET.
+Status is very much work in progress.
 
-Development status is currently alpha.
-Do not try to use this in any form of production environment yet.
+Tracing currently works for:
 
+* Local Actors
+* Remote Actors
+* ActorSelections
+
+And where it doesn't work:
+
+* Cluster Actors
+* Remote Deployed Actors
+* Async-Await, no tracing context is stored between async/await calls
+
+There are currently no configuration support, all actors in `/user/`-space are traced.
+
+Pull-requests are welcome.
 
 ## Getting started
 
@@ -34,5 +47,3 @@ var system = ActorSystem.Create("my-system", bootstrap);
 var props = Props.Create<MyActor>();
 var reff = system.ActorOf(props);
 ```
-
-Tracing is currently applied to all actors under `/user` path.
