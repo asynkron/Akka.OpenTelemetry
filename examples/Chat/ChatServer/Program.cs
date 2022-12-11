@@ -67,6 +67,7 @@ internal class ChatServerActor : ReceiveActor, ILogReceive
         Receive<ConnectRequest>(message =>
         {
             _clients.Add(Sender);
+            Console.WriteLine("Client connected " + Sender);
             Sender.Tell(new ConnectResponse
             {
                 Message = "Hello and welcome to Akka.NET chat example"

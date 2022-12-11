@@ -70,4 +70,17 @@ public sealed class OpenTelemetryRemoteActorRefProvider: RemoteActorRefProviderD
         }
         return (IInternalActorRef)child;
     }
+
+    public override IInternalActorRef ResolveActorRefWithLocalAddress(string path, Address localAddress)
+    {
+        var reff = base.ResolveActorRefWithLocalAddress(path, localAddress);
+        if (reff.Path.Elements.FirstOrDefault() == "user")
+        {
+            return reff;
+
+            //TODO: why does this break remoting?
+            return new OpenTelemetryRemoteActorRef(reff);
+        }
+       return reff;
+    }
 }

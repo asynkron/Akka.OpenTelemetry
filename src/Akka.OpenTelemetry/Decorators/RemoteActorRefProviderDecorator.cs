@@ -17,7 +17,14 @@ public class RemoteActorRefProviderDecorator : IRemoteActorRefProvider
     public virtual Deployer Deployer => Inner.Deployer;
     public virtual IInternalActorRef TempContainer => Inner.TempContainer;
     public virtual Task TerminationTask => Inner.TerminationTask;
-    public virtual Address DefaultAddress => Inner.DefaultAddress;
+    public virtual Address DefaultAddress
+    {
+        get
+        {
+            return Inner.DefaultAddress;
+        }
+    }
+
     public virtual Information SerializationInformation => Inner.SerializationInformation;
     public virtual IInternalActorRef RootGuardian => Inner.RootGuardian;
     public virtual LocalActorRef Guardian => Inner.Guardian;

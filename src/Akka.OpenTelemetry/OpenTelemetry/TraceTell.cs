@@ -25,6 +25,11 @@ public static class TraceTell
 
     public static OpenTelemetryEnvelope ExtractHeaders(object message)
     {
+        if (message is OpenTelemetryEnvelope e)
+        {
+            return e;
+        }
+
         var activity = Activity.Current;
         if (activity is null)
         {
