@@ -31,7 +31,8 @@ var tracerProvider = Sdk.CreateTracerProviderBuilder()
 //augment config with OpenTelemetry settings
 var bootstrap = BootstrapSetup.Create().WithOpenTelemetry();
 var system = ActorSystem.Create("my-system", bootstrap);
-//create props with tracing enabled
-var props = Props.Create<MyActor>().WithTracing(); //this will likely change
+var props = Props.Create<MyActor>();
 var reff = system.ActorOf(props);
 ```
+
+Tracing is currently applied to all actors under `/user` path.
