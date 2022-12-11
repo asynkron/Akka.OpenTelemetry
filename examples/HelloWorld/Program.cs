@@ -27,7 +27,7 @@ using (var activity = source.StartActivity("demo", ActivityKind.Client))
     var bootstrap = BootstrapSetup.Create().WithOpenTelemetry();
 
     var system = ActorSystem.Create("my-system", bootstrap);
-    var props = Props.Create<MyActor>().WithTracing();
+    var props = Props.Create<MyActor>();
     var reff = system.ActorOf(props);
 
     reff.Tell(new SpawnChild());
@@ -55,7 +55,7 @@ namespace Demo
             {
                 case SpawnChild:
                 {
-                    var childProps = Props.Create<MyChildActor>().WithTracing();
+                    var childProps = Props.Create<MyChildActor>();
                     var reff = Context.ActorOf(childProps);
                     reff.Tell("hello");
                     break;

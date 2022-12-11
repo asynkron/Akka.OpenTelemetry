@@ -7,9 +7,7 @@ namespace Akka.Decorators;
 
 public class RemoteActorRefProviderDecorator : IRemoteActorRefProvider
 {
-    protected IRemoteActorRefProvider _inner = default!;
-
-    public virtual IRemoteActorRefProvider Inner => _inner;
+    protected IRemoteActorRefProvider Inner = default!;
     public virtual IActorRef DeadLetters => Inner.DeadLetters;
     public virtual IActorRef IgnoreRef => Inner.IgnoreRef;
     public virtual ActorPath RootPath => Inner.RootPath;

@@ -29,6 +29,4 @@ public class OpenTelemetryRepointableActorRef : RepointableActorRef
         var envelope = TraceTell.ExtractHeaders(message, Props);
         base.TellInternal(envelope, sender);
     }
-
-
 }

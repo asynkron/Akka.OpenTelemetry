@@ -16,18 +16,9 @@ public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
     public OpenTelemetryActorCell(ActorSystemImpl system, IInternalActorRef self, Props props,
         MessageDispatcher dispatcher, IInternalActorRef parent) : base(system, self, props, dispatcher, parent)
     {
+        //TODO: where should this be injected?
         _openTelemetrySettings = new OpenTelemetrySettings(true);
         _parentSpanId = null;
-
-        // if (openTelemetrySettings == null)
-        // {
-        //
-        // }
-        // else
-        // {
-        //     _openTelemetrySettings = openTelemetrySettings;
-        //     _parentSpanId = _openTelemetrySettings.ParentId ?? "";
-        // }
     }
 
     private OpenTelemetryEnvelope? _currentEnvelope;

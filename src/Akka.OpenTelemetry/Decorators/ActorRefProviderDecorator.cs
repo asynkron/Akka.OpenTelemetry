@@ -6,11 +6,7 @@ namespace Akka.Decorators;
 
 public abstract class ActorRefProviderDecorator : IActorRefProvider
 {
-    protected IActorRefProvider _inner = default!;
-
-
-    protected IActorRefProvider Inner => _inner;
-
+    protected IActorRefProvider Inner = default!;
     public virtual IActorRef DeadLetters => Inner.DeadLetters;
     public virtual IActorRef IgnoreRef => Inner.IgnoreRef;
     public virtual ActorPath RootPath => Inner.RootPath;

@@ -8,12 +8,7 @@ namespace Akka.Decorators;
 
 public class ClusterActorRefProviderDecorator :  IClusterActorRefProvider
 {
-    private IClusterActorRefProvider _inner = default!;
-
-    protected virtual void SetInner(IClusterActorRefProvider inner) => _inner = inner;
-
-    protected IClusterActorRefProvider Inner => _inner;
-
+    protected IClusterActorRefProvider Inner = default!;
     public virtual IActorRef DeadLetters => Inner.DeadLetters;
     public virtual IActorRef IgnoreRef => Inner.IgnoreRef;
     public virtual ActorPath RootPath => Inner.RootPath;

@@ -20,8 +20,6 @@ public static class TypeExtensions
         return message?.GetType().Name ?? "null";
     }
 
-    public static Props WithTracing(this Props self) => self.WithDeploy(new OpenTelemetryDeploy());
-
     public static BootstrapSetup WithOpenTelemetry(this BootstrapSetup self)
     {
         var bootstrap = self.WithConfig(
