@@ -4,10 +4,11 @@ using Akka.Actor;
 using Akka.Actor.Internal;
 using Akka.Dispatch;
 using Akka.Dispatch.SysMsg;
+using Akka.OpenTelemetry.Local.ActorRefs;
 
 namespace Akka.OpenTelemetry.Cell;
 
-public class OpenTelemetryActorCell : ActorCell
+public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
 {
     private readonly OpenTelemetrySettings _openTelemetrySettings;
     private string _parentSpanId;
@@ -146,5 +147,14 @@ public class OpenTelemetryActorCell : ActorCell
         AddEvent(activity);
         activity?.AddEvent(new ActivityEvent("SystemMessage: " + systemMessage));
         base.SendSystemMessage(systemMessage);
+    }
+
+    public new ActorSelection ActorSelection(string actorPath)
+    {
+        Console.WriteLine("getting here?");
+        var selection = base.ActorSelection(actorPath);
+        var tracableAnchor = new ActorSelectionAnchorActorRef((selection.Anchor as IInternalActorRef)!);
+        var x = new ActorSelection(tracableAnchor, selection.Path);
+        return x;
     }
 }

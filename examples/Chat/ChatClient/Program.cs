@@ -40,7 +40,7 @@ var tracerProvider = Sdk.CreateTracerProviderBuilder()
     .Build();
 
 using var system = ActorSystem.Create("MyClient", config);
-var props = Props.Create<ChatClientActor>().WithTracing();
+var props = Props.Create(() => new ChatClientActor()).WithTracing();
 var chatClient = system.ActorOf(props);
 chatClient.Tell(new ConnectRequest
 {

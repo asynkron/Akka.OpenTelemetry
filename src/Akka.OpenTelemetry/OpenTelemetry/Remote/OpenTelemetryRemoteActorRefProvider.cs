@@ -31,6 +31,7 @@ public sealed class OpenTelemetryRemoteActorRefProvider: RemoteActorRefProviderD
     {
         if (NotTraced(props, systemService))
         {
+            Console.WriteLine("Not traced " + path);
             return base.ActorOf(system, props, supervisor, path, systemService, deploy, lookupDeploy, async);
         }
 
