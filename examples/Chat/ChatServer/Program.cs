@@ -41,7 +41,7 @@ var tracerProvider = Sdk.CreateTracerProviderBuilder()
     .Build();
 
 using var system = ActorSystem.Create("MyServer", config);
-var props = Props.Create(() => new ChatServerActor()).WithTracing();
+var props = Props.Create(() => new ChatServerActor());
 system.ActorOf(props, "ChatServer");
 
 tracerProvider.ForceFlush();

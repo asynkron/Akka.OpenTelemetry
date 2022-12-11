@@ -8,9 +8,9 @@ namespace Akka;
 
 public static class Spawner
 {
-    public static bool NotTraced(Props props, bool systemService)
+    public static bool NotTraced(Props props, bool systemService, ActorPath path)
     {
-        return systemService || props.Deploy is not OpenTelemetryDeploy;
+        return systemService || path.Elements.First() != "user";
     }
 
     public static IInternalActorRef LocalActorOf (ActorSystemImpl system, Props props, IInternalActorRef supervisor,

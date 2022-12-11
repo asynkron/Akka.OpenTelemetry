@@ -6,31 +6,31 @@ namespace Akka.Decorators;
 
 public abstract class ActorRefProviderDecorator : IActorRefProvider
 {
-    protected IActorRefProvider _localProvider = default!;
+    protected IActorRefProvider _inner = default!;
 
 
-    protected IActorRefProvider LocalProvider => _localProvider;
+    protected IActorRefProvider Inner => _inner;
 
-    public virtual IActorRef DeadLetters => LocalProvider.DeadLetters;
-    public virtual IActorRef IgnoreRef => LocalProvider.IgnoreRef;
-    public virtual ActorPath RootPath => LocalProvider.RootPath;
-    public virtual Settings Settings => LocalProvider.Settings;
-    public virtual Deployer Deployer => LocalProvider.Deployer;
-    public virtual IInternalActorRef TempContainer => LocalProvider.TempContainer;
-    public virtual Task TerminationTask => LocalProvider.TerminationTask;
-    public virtual Address DefaultAddress => LocalProvider.DefaultAddress;
-    public virtual Information SerializationInformation => LocalProvider.SerializationInformation;
-    public virtual IInternalActorRef RootGuardian => LocalProvider.RootGuardian;
-    public virtual LocalActorRef Guardian => LocalProvider.Guardian;
-    public virtual LocalActorRef SystemGuardian => LocalProvider.SystemGuardian;
-    public virtual IActorRef RootGuardianAt(Address address) => LocalProvider.RootGuardianAt(address);
-    public virtual void Init(ActorSystemImpl system) => LocalProvider.Init(system);
-    public virtual ActorPath TempPath() => LocalProvider.TempPath();
-    public virtual void RegisterTempActor(IInternalActorRef actorRef, ActorPath path) => LocalProvider.RegisterTempActor(actorRef, path);
-    public virtual void UnregisterTempActor(ActorPath path) => LocalProvider.UnregisterTempActor(path);
-    public virtual FutureActorRef<T> CreateFutureRef<T>(TaskCompletionSource<T> tcs) => LocalProvider.CreateFutureRef(tcs);
-    public virtual IInternalActorRef ActorOf(ActorSystemImpl system, Props props, IInternalActorRef supervisor, ActorPath path, bool systemService, Deploy deploy, bool lookupDeploy, bool async) => LocalProvider.ActorOf(system, props, supervisor, path, systemService, deploy, lookupDeploy, async);
-    public virtual IActorRef ResolveActorRef(string path) => LocalProvider.ResolveActorRef(path);
-    public virtual IActorRef ResolveActorRef(ActorPath actorPath) => LocalProvider.ResolveActorRef(actorPath);
-    public virtual Address GetExternalAddressFor(Address address) => LocalProvider.GetExternalAddressFor(address);
+    public virtual IActorRef DeadLetters => Inner.DeadLetters;
+    public virtual IActorRef IgnoreRef => Inner.IgnoreRef;
+    public virtual ActorPath RootPath => Inner.RootPath;
+    public virtual Settings Settings => Inner.Settings;
+    public virtual Deployer Deployer => Inner.Deployer;
+    public virtual IInternalActorRef TempContainer => Inner.TempContainer;
+    public virtual Task TerminationTask => Inner.TerminationTask;
+    public virtual Address DefaultAddress => Inner.DefaultAddress;
+    public virtual Information SerializationInformation => Inner.SerializationInformation;
+    public virtual IInternalActorRef RootGuardian => Inner.RootGuardian;
+    public virtual LocalActorRef Guardian => Inner.Guardian;
+    public virtual LocalActorRef SystemGuardian => Inner.SystemGuardian;
+    public virtual IActorRef RootGuardianAt(Address address) => Inner.RootGuardianAt(address);
+    public virtual void Init(ActorSystemImpl system) => Inner.Init(system);
+    public virtual ActorPath TempPath() => Inner.TempPath();
+    public virtual void RegisterTempActor(IInternalActorRef actorRef, ActorPath path) => Inner.RegisterTempActor(actorRef, path);
+    public virtual void UnregisterTempActor(ActorPath path) => Inner.UnregisterTempActor(path);
+    public virtual FutureActorRef<T> CreateFutureRef<T>(TaskCompletionSource<T> tcs) => Inner.CreateFutureRef(tcs);
+    public virtual IInternalActorRef ActorOf(ActorSystemImpl system, Props props, IInternalActorRef supervisor, ActorPath path, bool systemService, Deploy deploy, bool lookupDeploy, bool async) => Inner.ActorOf(system, props, supervisor, path, systemService, deploy, lookupDeploy, async);
+    public virtual IActorRef ResolveActorRef(string path) => Inner.ResolveActorRef(path);
+    public virtual IActorRef ResolveActorRef(ActorPath actorPath) => Inner.ResolveActorRef(actorPath);
+    public virtual Address GetExternalAddressFor(Address address) => Inner.GetExternalAddressFor(address);
 }
