@@ -14,6 +14,7 @@ public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
     private readonly OpenTelemetrySettings _openTelemetrySettings;
 
     private OpenTelemetryEnvelope? _currentEnvelope;
+    public OpenTelemetrySettings OpenTelemetrySettings => _openTelemetrySettings;
     private string? _parentSpanId;
 
     public OpenTelemetryActorCell(ActorSystemImpl system, IInternalActorRef self, Props props,
@@ -48,7 +49,7 @@ public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
         var res = base.ActorOf(props, name);
         activity?.AddEvent(new ActivityEvent("Spawned Child: " + res));
 
-        System.Hooks().ActorChildSpawned(props, res, Self);
+        System.Hooks().ActorChildSpawned(_openTelemetrySettings,props, res, Self);
 
         return res;
     }
@@ -58,7 +59,7 @@ public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
         var selection = base.ActorSelection(actorPath);
         var anchor = new ActorSelectionAnchorActorRef((selection.Anchor as IInternalActorRef)!);
         var actorSelection = new ActorSelection(anchor, selection.Path);
-        System.Hooks().ActorSelectionCreated(actorSelection, Self);
+        System.Hooks().ActorSelectionCreated(_openTelemetrySettings,actorSelection, Self);
         return actorSelection;
     }
 
@@ -67,7 +68,7 @@ public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
         var selection = base.ActorSelection(actorPath);
         var anchor = new ActorSelectionAnchorActorRef((selection.Anchor as IInternalActorRef)!);
         var actorSelection = new ActorSelection(anchor, selection.Path);
-        System.Hooks().ActorSelectionCreated(actorSelection, Self);
+        System.Hooks().ActorSelectionCreated(_openTelemetrySettings,actorSelection, Self);
         return actorSelection;
     }
 
@@ -110,7 +111,7 @@ public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
 
     private void ReceiveInner(OpenTelemetryEnvelope envelope)
     {
-        System.Hooks().ActorReceivedMessage(envelope.Message, Self, () => Invoke(new Envelope(envelope.Message, Sender, System)));
+        System.Hooks().ActorAroundReceiveMessage(_openTelemetrySettings,envelope.Message, Self, () => Invoke(new Envelope(envelope.Message, Sender, System)));
     }
 
     private void ReceiveActivitySetup(Activity? activity, object message)
@@ -126,7 +127,7 @@ public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
         using var activity =
             OpenTelemetryHelpers.ActivitySource.StartActivity(nameof(PreStart), ActivityKind.Server, _parentSpanId!);
         AddEvent(activity);
-        System.Hooks().ActorPreStart(Self , () => base.PreStart());
+        System.Hooks().ActorAroundPreStart(_openTelemetrySettings,Self , () => base.PreStart());
     }
 
     public override void Start()
@@ -134,13 +135,13 @@ public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
         using var activity =
             OpenTelemetryHelpers.ActivitySource.StartActivity(nameof(Start), ActivityKind.Server, _parentSpanId!);
         AddEvent(activity);
-        System.Hooks().ActorStart(Self, () => base.Start());
+        System.Hooks().ActorAroundStart(_openTelemetrySettings,Self, () => base.Start());
     }
 
     protected override ActorBase CreateNewActorInstance()
     {
         var res = base.CreateNewActorInstance();
-        System.Hooks().ActorCreateNewActorInstance(res, Self);
+        System.Hooks().ActorCreateNewActorInstance(_openTelemetrySettings,res, Self);
         return res;
     }
 
@@ -171,8 +172,8 @@ public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
             OpenTelemetryHelpers.ActivitySource.StartActivity(nameof(AutoReceiveMessage), ActivityKind.Server,
                 _parentSpanId!);
         AddEvent(activity);
-        System.Hooks().ActorAutoReceiveMessage(envelope.Message, Self, envelope.Sender);
-        base.AutoReceiveMessage(envelope);
+        System.Hooks().ActorAroundAutoReceiveMessage(_openTelemetrySettings, envelope.Message, Self, envelope.Sender,
+            () => base.AutoReceiveMessage(envelope));
     }
 
     public override void SendSystemMessage(ISystemMessage systemMessage)
@@ -182,7 +183,7 @@ public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
                 _parentSpanId!);
         AddEvent(activity);
         activity?.AddEvent(new ActivityEvent("SystemMessage: " + systemMessage));
-        System.Hooks().ActorSendSystemMessage(systemMessage, Self);
+        System.Hooks().ActorSendSystemMessage(_openTelemetrySettings,systemMessage, Self);
         base.SendSystemMessage(systemMessage);
     }
 }

@@ -1,5 +1,6 @@
 using Akka.Actor;
 using Akka.Actor.Internal;
+using Akka.OpenTelemetry.Cell;
 using Akka.OpenTelemetry.Telemetry;
 using Akka.Remote;
 
@@ -20,7 +21,12 @@ public class OpenTelemetryRemoteActorRef : RemoteActorRef
         {
             var system = InternalCurrentActorCellKeeper.Current.System;
             var self = InternalCurrentActorCellKeeper.Current.Self;
-            system.Hooks().ActorSendMessage(message, self, this, sender);
+            var settings = (InternalCurrentActorCellKeeper.Current as OpenTelemetryActorCell)?.OpenTelemetrySettings;
+            if (settings != null)
+            {
+                //only call hook if we are in a tracable actor context
+                system.Hooks().ActorSendMessage(settings, message, self, this, sender);
+            }
         }
         base.TellInternal(envelope, sender);
     }

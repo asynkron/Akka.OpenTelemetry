@@ -42,10 +42,10 @@ public static class ActorOfUtils
                 true => new OpenTelemetryRepointableActorRef(settings, system, props2, dispatcher, mailboxType,
                     supervisor,
                     path).Initialize(async),
-                _ => new OpenTelemetryLocalActorRef(settings, system, props, dispatcher, mailboxType, supervisor, path)
+                _ => new OpenTelemetryLocalActorRef(system, props, dispatcher, mailboxType, supervisor, path)
             };
 
-            system.Hooks().ActorSpawned(props, reff);
+            system.Hooks().ActorSpawned(settings, props, reff);
 
             return reff;
         }

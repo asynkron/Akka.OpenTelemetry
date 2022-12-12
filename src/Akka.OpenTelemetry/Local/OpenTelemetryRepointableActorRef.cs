@@ -33,7 +33,12 @@ public class OpenTelemetryRepointableActorRef : RepointableActorRef
         {
             var system = InternalCurrentActorCellKeeper.Current.System;
             var self = InternalCurrentActorCellKeeper.Current.Self;
-            system.Hooks().ActorSendMessage(message, self, this, sender);
+            var settings = (InternalCurrentActorCellKeeper.Current as OpenTelemetryActorCell)?.OpenTelemetrySettings;
+            if (settings != null)
+            {
+                //only call hook if we are in a tracable actor context
+                system.Hooks().ActorSendMessage(settings, message, self, this, sender);
+            }
         }
         base.TellInternal(envelope, sender);
     }
