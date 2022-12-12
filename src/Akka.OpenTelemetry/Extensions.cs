@@ -30,5 +30,8 @@ akka.actor.provider = "Akka.OpenTelemetry.Local.OpenTelemetryLocalActorRefProvid
         return bootstrap;
     }
 
-    public static Hooks Hooks(this ActorSystem system) => Otel.For(system).Hooks;
+    public static Hooks Hooks(this ActorSystem system)
+    {
+        return Otel.For(system).Hooks;
+    }
 }

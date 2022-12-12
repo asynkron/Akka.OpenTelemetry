@@ -1,7 +1,6 @@
 using Akka.Actor;
 using Akka.Actor.Internal;
 using Akka.Configuration;
-using Akka.OpenTelemetry;
 using Akka.OpenTelemetry.Local;
 using Akka.OpenTelemetry.Telemetry;
 

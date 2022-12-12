@@ -1,4 +1,3 @@
-using Akka.Actor;
 using Akka.OpenTelemetry.Cell;
 
 namespace Akka.OpenTelemetry.Telemetry;

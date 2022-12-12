@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Akka.Actor;
 using Akka.Actor.Internal;
 using Akka.Dispatch;
@@ -10,23 +9,20 @@ namespace Akka.OpenTelemetry.Cell;
 
 public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
 {
-    private readonly OpenTelemetrySettings _settings;
-
-    private OpenTelemetryEnvelope? _currentEnvelope;
-    public OpenTelemetrySettings Settings => _settings;
-
-    public string ActorType => base.Actor?.ToString() ?? "<null>";
-
     public OpenTelemetryActorCell(ActorSystemImpl system, IInternalActorRef self, Props props,
         MessageDispatcher dispatcher, IInternalActorRef parent) : base(system, self, props, dispatcher, parent)
     {
         //TODO: where should this be injected?
-        _settings = new OpenTelemetrySettings(true)
+        Settings = new OpenTelemetrySettings(true)
         {
             ParentSpanId = null,
             Context = this
         };
     }
+
+    public OpenTelemetrySettings Settings { get; }
+
+    public string ActorType => Actor?.ToString() ?? "<null>";
 
     // public override void SendMessage(Envelope message)
     // {
@@ -46,11 +42,10 @@ public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
 
     public override IActorRef ActorOf(Props props, string? name = null)
     {
-
         var res = base.ActorOf(props, name);
 
 
-        System.Hooks().ActorChildSpawned(_settings,props, res, Self);
+        System.Hooks().ActorChildSpawned(Settings, props, res, Self);
 
         return res;
     }
@@ -60,7 +55,7 @@ public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
         var selection = base.ActorSelection(actorPath);
         var anchor = new ActorSelectionAnchorActorRef((selection.Anchor as IInternalActorRef)!);
         var actorSelection = new ActorSelection(anchor, selection.Path);
-        System.Hooks().ActorSelectionCreated(_settings,actorSelection, Self);
+        System.Hooks().ActorSelectionCreated(Settings, actorSelection, Self);
         return actorSelection;
     }
 
@@ -69,7 +64,7 @@ public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
         var selection = base.ActorSelection(actorPath);
         var anchor = new ActorSelectionAnchorActorRef((selection.Anchor as IInternalActorRef)!);
         var actorSelection = new ActorSelection(anchor, selection.Path);
-        System.Hooks().ActorSelectionCreated(_settings,actorSelection, Self);
+        System.Hooks().ActorSelectionCreated(Settings, actorSelection, Self);
         return actorSelection;
     }
 
@@ -82,34 +77,29 @@ public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
             return;
         }
 
-        _currentEnvelope = envelope;
-
-
-
-            //shady, yes, but we need to trigger receive timeout etc.
-            ReceiveInner(envelope);
-
+        ReceiveInner(envelope);
     }
 
     private void ReceiveInner(OpenTelemetryEnvelope envelope)
     {
-        System.Hooks().ActorAroundReceiveMessage(_settings,envelope, Self, () => Invoke(new Envelope(envelope.Message, Sender, System)));
+        System.Hooks().ActorAroundReceiveMessage(Settings, envelope, Self,
+            () => Invoke(new Envelope(envelope.Message, Sender, System)));
     }
 
     protected override void PreStart()
     {
-        System.Hooks().ActorAroundPreStart(_settings,Self , () => base.PreStart());
+        System.Hooks().ActorAroundPreStart(Settings, Self, () => base.PreStart());
     }
 
     public override void Start()
     {
-        System.Hooks().ActorAroundStart(_settings,Self, () => base.Start());
+        System.Hooks().ActorAroundStart(Settings, Self, () => base.Start());
     }
 
     protected override ActorBase CreateNewActorInstance()
     {
         var res = base.CreateNewActorInstance();
-        System.Hooks().ActorCreateNewActorInstance(_settings,res, Self);
+        System.Hooks().ActorCreateNewActorInstance(Settings, res, Self);
         return res;
     }
 
@@ -129,13 +119,13 @@ public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
 
     protected override void AutoReceiveMessage(Envelope envelope)
     {
-        System.Hooks().ActorAroundAutoReceiveMessage(_settings, envelope.Message, Self, envelope.Sender,
+        System.Hooks().ActorAroundAutoReceiveMessage(Settings, envelope.Message, Self, envelope.Sender,
             () => base.AutoReceiveMessage(envelope));
     }
 
     public override void SendSystemMessage(ISystemMessage systemMessage)
     {
-        System.Hooks().ActorSendSystemMessage(_settings,systemMessage, Self);
+        System.Hooks().ActorSendSystemMessage(Settings, systemMessage, Self);
         base.SendSystemMessage(systemMessage);
     }
 }

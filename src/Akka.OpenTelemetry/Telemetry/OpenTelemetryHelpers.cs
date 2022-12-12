@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Akka.Actor;
-using Akka.Actor.Internal;
 using OpenTelemetry;
 using OpenTelemetry.Context.Propagation;
 

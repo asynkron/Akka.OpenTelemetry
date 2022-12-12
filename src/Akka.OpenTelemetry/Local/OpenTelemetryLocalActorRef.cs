@@ -8,12 +8,10 @@ namespace Akka.OpenTelemetry.Local;
 
 public class OpenTelemetryLocalActorRef : LocalActorRef
 {
-
     public OpenTelemetryLocalActorRef(ActorSystemImpl system, Props props,
         MessageDispatcher dispatcher, MailboxType mailboxType, IInternalActorRef supervisor, ActorPath path) : base(
         system, props, dispatcher, mailboxType, supervisor, path)
     {
-
     }
 
     protected override void TellInternal(object message, IActorRef sender)
@@ -21,16 +19,14 @@ public class OpenTelemetryLocalActorRef : LocalActorRef
         var envelope = OpenTelemetryHelpers.ExtractHeaders(message, Props);
         if (InternalCurrentActorCellKeeper.Current != null)
         {
-
             var system = InternalCurrentActorCellKeeper.Current.System;
             var self = InternalCurrentActorCellKeeper.Current.Self;
             var settings = (InternalCurrentActorCellKeeper.Current as OpenTelemetryActorCell)?.Settings;
             if (settings != null)
-            {
                 //only call hook if we are in a tracable actor context
                 system.Hooks().ActorSendMessage(settings, message, self, this, sender);
-            }
         }
+
         base.TellInternal(envelope, sender);
     }
 
