@@ -17,7 +17,6 @@ public sealed class OpenTelemetryRemoteActorRefProvider: RemoteActorRefProviderD
     public override void Init(ActorSystemImpl system)
     {
         Inner.Init(system);
-        Logging.GetLogger(system.EventStream, "OpenTelemetryRemoteActorRefProvider(" + Inner.RootPath.Address + ")");
     }
 
     public override IInternalActorRef ActorOf(ActorSystemImpl system, Props props, IInternalActorRef supervisor,
