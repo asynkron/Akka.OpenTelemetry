@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using Akka.Actor;
 using Akka.Actor.Internal;
 using Akka.Dispatch;
@@ -16,12 +15,17 @@ public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
     private OpenTelemetryEnvelope? _currentEnvelope;
     public OpenTelemetrySettings Settings => _settings;
 
+    public string ActorType => base.Actor?.ToString() ?? "<null>";
+
     public OpenTelemetryActorCell(ActorSystemImpl system, IInternalActorRef self, Props props,
         MessageDispatcher dispatcher, IInternalActorRef parent) : base(system, self, props, dispatcher, parent)
     {
         //TODO: where should this be injected?
-        _settings = new OpenTelemetrySettings(true);
-        _settings.ParentSpanId = null;
+        _settings = new OpenTelemetrySettings(true)
+        {
+            ParentSpanId = null,
+            Context = this
+        };
     }
 
     // public override void SendMessage(Envelope message)
@@ -42,11 +46,9 @@ public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
 
     public override IActorRef ActorOf(Props props, string? name = null)
     {
-        using var activity =
-            OpenTelemetryHelpers.ActivitySource.StartActivity(nameof(ActorOf), ActivityKind.Server, _settings.ParentSpanId!);
-        AddEvent(activity);
+
         var res = base.ActorOf(props, name);
-        activity?.AddEvent(new ActivityEvent("Spawned Child: " + res));
+
 
         System.Hooks().ActorChildSpawned(_settings,props, res, Self);
 
@@ -82,58 +84,25 @@ public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
 
         _currentEnvelope = envelope;
 
-        if (_settings.EnableTracing)
-        {
-            if (Activity.Current != null) _settings.ParentSpanId = Activity.Current.Id!;
 
-            var propagationContext = envelope.Headers.ExtractPropagationContext();
 
-            var actorType = Actor.ToString();
-            using var activity =
-                OpenTelemetryHelpers
-                    .BuildStartedActivity(
-                        propagationContext.ActivityContext,
-                        actorType ?? "null",
-                        nameof(ReceiveMessage),
-                        envelope.Message,
-                        ReceiveActivitySetup);
-
-            _settings.ParentSpanId = activity?.Id ?? "";
             //shady, yes, but we need to trigger receive timeout etc.
             ReceiveInner(envelope);
-        }
-        else
-        {
-            ReceiveInner(envelope);
-        }
+
     }
 
     private void ReceiveInner(OpenTelemetryEnvelope envelope)
     {
-        System.Hooks().ActorAroundReceiveMessage(_settings,envelope.Message, Self, () => Invoke(new Envelope(envelope.Message, Sender, System)));
-    }
-
-    private void ReceiveActivitySetup(Activity? activity, object message)
-    {
-        activity?.SetTag(OtelTags.ActorType, Props.Type.Name)
-            .SetTag(OtelTags.MessageType, message.GetTypeName())
-            .SetTag(OtelTags.ActorRef, Self.ToString())
-            .SetTag(OtelTags.SenderActorRef, Sender.ToString());
+        System.Hooks().ActorAroundReceiveMessage(_settings,envelope, Self, () => Invoke(new Envelope(envelope.Message, Sender, System)));
     }
 
     protected override void PreStart()
     {
-        using var activity =
-            OpenTelemetryHelpers.ActivitySource.StartActivity(nameof(PreStart), ActivityKind.Server, _settings.ParentSpanId!);
-        AddEvent(activity);
         System.Hooks().ActorAroundPreStart(_settings,Self , () => base.PreStart());
     }
 
     public override void Start()
     {
-        using var activity =
-            OpenTelemetryHelpers.ActivitySource.StartActivity(nameof(Start), ActivityKind.Server, _settings.ParentSpanId!);
-        AddEvent(activity);
         System.Hooks().ActorAroundStart(_settings,Self, () => base.Start());
     }
 
@@ -157,31 +126,15 @@ public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
     //     return res;
     // }
 
-    private void AddEvent(Activity? activity, [CallerMemberName] string callerName = "")
-    {
-        activity?.AddEvent(new ActivityEvent(callerName));
-        activity?.AddTag(OtelTags.ActorType, Props.Type.Name);
-    }
-
-
 
     protected override void AutoReceiveMessage(Envelope envelope)
     {
-        using var activity =
-            OpenTelemetryHelpers.ActivitySource.StartActivity(nameof(AutoReceiveMessage), ActivityKind.Server,
-                _settings.ParentSpanId!);
-        AddEvent(activity);
         System.Hooks().ActorAroundAutoReceiveMessage(_settings, envelope.Message, Self, envelope.Sender,
             () => base.AutoReceiveMessage(envelope));
     }
 
     public override void SendSystemMessage(ISystemMessage systemMessage)
     {
-        using var activity =
-            OpenTelemetryHelpers.ActivitySource.StartActivity(nameof(SendSystemMessage), ActivityKind.Server,
-                _settings.ParentSpanId!);
-        AddEvent(activity);
-        activity?.AddEvent(new ActivityEvent("SystemMessage: " + systemMessage));
         System.Hooks().ActorSendSystemMessage(_settings,systemMessage, Self);
         base.SendSystemMessage(systemMessage);
     }
