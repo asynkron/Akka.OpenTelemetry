@@ -48,7 +48,6 @@ public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
         var res = base.ActorOf(props, name);
         activity?.AddEvent(new ActivityEvent("Spawned Child: " + res));
 
-
         System.Hooks().ActorChildSpawned(props, res, Self);
 
         return res;
@@ -57,9 +56,19 @@ public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
     public new ActorSelection ActorSelection(string actorPath)
     {
         var selection = base.ActorSelection(actorPath);
-        var tracableAnchor = new ActorSelectionAnchorActorRef((selection.Anchor as IInternalActorRef)!);
-        var x = new ActorSelection(tracableAnchor, selection.Path);
-        return x;
+        var anchor = new ActorSelectionAnchorActorRef((selection.Anchor as IInternalActorRef)!);
+        var actorSelection = new ActorSelection(anchor, selection.Path);
+        System.Hooks().ActorSelectionCreated(actorSelection, Self);
+        return actorSelection;
+    }
+
+    public new ActorSelection ActorSelection(ActorPath actorPath)
+    {
+        var selection = base.ActorSelection(actorPath);
+        var anchor = new ActorSelectionAnchorActorRef((selection.Anchor as IInternalActorRef)!);
+        var actorSelection = new ActorSelection(anchor, selection.Path);
+        System.Hooks().ActorSelectionCreated(actorSelection, Self);
+        return actorSelection;
     }
 
     protected override void ReceiveMessage(object message)
@@ -101,8 +110,7 @@ public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
 
     private void ReceiveInner(OpenTelemetryEnvelope envelope)
     {
-        Invoke(new Envelope(envelope.Message, Sender, System));
-        System.Hooks().ActorReceivedMessage(envelope.Message, Self);
+        System.Hooks().ActorReceivedMessage(envelope.Message, Self, () => Invoke(new Envelope(envelope.Message, Sender, System)));
     }
 
     private void ReceiveActivitySetup(Activity? activity, object message)
@@ -118,7 +126,7 @@ public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
         using var activity =
             OpenTelemetryHelpers.ActivitySource.StartActivity(nameof(PreStart), ActivityKind.Server, _parentSpanId!);
         AddEvent(activity);
-        base.PreStart();
+        System.Hooks().ActorPreStart(Self , () => base.PreStart());
     }
 
     public override void Start()
@@ -126,7 +134,14 @@ public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
         using var activity =
             OpenTelemetryHelpers.ActivitySource.StartActivity(nameof(Start), ActivityKind.Server, _parentSpanId!);
         AddEvent(activity);
-        base.Start();
+        System.Hooks().ActorStart(Self, () => base.Start());
+    }
+
+    protected override ActorBase CreateNewActorInstance()
+    {
+        var res = base.CreateNewActorInstance();
+        System.Hooks().ActorCreateNewActorInstance(res, Self);
+        return res;
     }
 
     public override void SendMessage(Envelope message)
@@ -147,6 +162,8 @@ public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
         activity?.AddEvent(new ActivityEvent(callerName));
         activity?.AddTag(OtelTags.ActorType, Props.Type.Name);
     }
+
+
 
     protected override void AutoReceiveMessage(Envelope envelope)
     {

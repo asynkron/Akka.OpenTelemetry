@@ -1,6 +1,4 @@
 using Akka.Actor;
-using Akka.OpenTelemetry.Local;
-using Akka.Util.Internal;
 
 namespace Akka.OpenTelemetry;
 
@@ -23,6 +21,9 @@ internal sealed class OpenTelemetryExtension : ExtensionIdProvider<Otel>
 {
     public override Otel CreateExtension(ExtendedActorSystem system)
     {
+        //subscribe to IActorTelemetryEvent. new event type in Akka.NET
+        //system.EventStream.Subscribe<Akka.Actor.IActorTelemetryEvent>()
+
         return new Otel();
     }
 }
