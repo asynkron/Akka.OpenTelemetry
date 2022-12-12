@@ -23,6 +23,6 @@ internal sealed class OpenTelemetryExtension : ExtensionIdProvider<OpenTelemetry
 {
     public override OpenTelemetry CreateExtension(ExtendedActorSystem system)
     {
-        return new(system.Provider.AsInstanceOf<OpenTelemetryLocalActorRefProvider>());
+        return new OpenTelemetry(system.Provider.AsInstanceOf<OpenTelemetryLocalActorRefProvider>());
     }
 }

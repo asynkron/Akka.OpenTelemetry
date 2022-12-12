@@ -8,10 +8,12 @@ namespace Akka.OpenTelemetry.Local;
 
 public class OpenTelemetryRepointableActorRef : RepointableActorRef
 {
-    private readonly OpenTelemetrySettings _settings;
     private readonly MailboxType _mailboxType;
+    private readonly OpenTelemetrySettings _settings;
 
-    public OpenTelemetryRepointableActorRef(OpenTelemetrySettings settings, ActorSystemImpl system, Props props, MessageDispatcher dispatcher, MailboxType mailboxType, IInternalActorRef supervisor, ActorPath path) : base(system, props, dispatcher, mailboxType, supervisor, path)
+    public OpenTelemetryRepointableActorRef(OpenTelemetrySettings settings, ActorSystemImpl system, Props props,
+        MessageDispatcher dispatcher, MailboxType mailboxType, IInternalActorRef supervisor, ActorPath path) : base(
+        system, props, dispatcher, mailboxType, supervisor, path)
     {
         _settings = settings;
         _mailboxType = mailboxType;

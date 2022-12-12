@@ -23,12 +23,9 @@ public sealed class OpenTelemetryLocalActorRefProvider : LocalActorRefProviderDe
         bool systemService, Deploy deploy, bool lookupDeploy, bool async)
     {
         if (ActorOfUtils.NotTraced(props, systemService, path))
-        {
             return base.ActorOf(system, props, supervisor, path, systemService, deploy, lookupDeploy, async);
-        }
 
         //reuse the spawn logic
         return ActorOfUtils.LocalActorOf(system, props, supervisor, path, deploy, lookupDeploy, async);
     }
-
 }

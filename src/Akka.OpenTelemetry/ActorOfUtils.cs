@@ -13,10 +13,9 @@ public static class ActorOfUtils
         return systemService || path.Elements.FirstOrDefault() != "user";
     }
 
-    public static IInternalActorRef LocalActorOf (ActorSystemImpl system, Props props, IInternalActorRef supervisor,
+    public static IInternalActorRef LocalActorOf(ActorSystemImpl system, Props props, IInternalActorRef supervisor,
         ActorPath path, Deploy deploy, bool lookupDeploy, bool async)
     {
-
         var props2 = props;
         var propsDeploy = lookupDeploy ? system.Provider.Deployer.Lookup(path) : deploy;
         if (propsDeploy != null)
@@ -28,9 +27,7 @@ public static class ActorOfUtils
         }
 
         if (!system.Dispatchers.HasDispatcher(props2.Dispatcher))
-        {
             throw new ConfigurationException($"Dispatcher [{props2.Dispatcher}] not configured for path {path}");
-        }
 
         try
         {
@@ -41,7 +38,8 @@ public static class ActorOfUtils
             var settings = new OpenTelemetrySettings(true);
             return async switch
             {
-                true => new OpenTelemetryRepointableActorRef(settings, system, props2, dispatcher, mailboxType, supervisor,
+                true => new OpenTelemetryRepointableActorRef(settings, system, props2, dispatcher, mailboxType,
+                    supervisor,
                     path).Initialize(async),
                 _ => new OpenTelemetryLocalActorRef(settings, system, props, dispatcher, mailboxType, supervisor, path)
             };

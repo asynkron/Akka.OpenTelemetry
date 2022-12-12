@@ -7,15 +7,14 @@ namespace Akka;
 
 public static class Extensions
 {
-    public static TracerProviderBuilder AddAkkaInstrumentation(this TracerProviderBuilder builder) =>
-        builder.AddSource(OtelTags.ActivitySourceName);
+    public static TracerProviderBuilder AddAkkaInstrumentation(this TracerProviderBuilder builder)
+    {
+        return builder.AddSource(OtelTags.ActivitySourceName);
+    }
 
     public static string GetTypeName(this object? message)
     {
-        if (message is OpenTelemetryEnvelope envelope)
-        {
-            return envelope.Message.GetTypeName();
-        }
+        if (message is OpenTelemetryEnvelope envelope) return envelope.Message.GetTypeName();
 
         return message?.GetType().Name ?? "null";
     }

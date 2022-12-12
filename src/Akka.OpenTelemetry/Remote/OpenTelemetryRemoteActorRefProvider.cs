@@ -6,11 +6,10 @@ using JetBrains.Annotations;
 namespace Akka.OpenTelemetry.Remote;
 
 [UsedImplicitly]
-public sealed class OpenTelemetryRemoteActorRefProvider: RemoteActorRefProviderDecorator
+public sealed class OpenTelemetryRemoteActorRefProvider : RemoteActorRefProviderDecorator
 {
     public OpenTelemetryRemoteActorRefProvider(string systemName, Settings settings, EventStream eventStream)
     {
-
         Inner = new RemoteActorRefProvider2(systemName, settings, eventStream);
     }
 
@@ -24,9 +23,7 @@ public sealed class OpenTelemetryRemoteActorRefProvider: RemoteActorRefProviderD
         bool systemService, Deploy deploy, bool lookupDeploy, bool async)
     {
         if (ActorOfUtils.NotTraced(props, systemService, path))
-        {
             return base.ActorOf(system, props, supervisor, path, systemService, deploy, lookupDeploy, async);
-        }
 
         //TODO: figure out what to do with remote deployments here...
 

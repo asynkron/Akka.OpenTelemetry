@@ -12,6 +12,8 @@ namespace Akka.OpenTelemetry.Cell;
 public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
 {
     private readonly OpenTelemetrySettings _openTelemetrySettings;
+
+    private OpenTelemetryEnvelope? _currentEnvelope;
     private string? _parentSpanId;
 
     public OpenTelemetryActorCell(ActorSystemImpl system, IInternalActorRef self, Props props,
@@ -22,7 +24,41 @@ public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
         _parentSpanId = null;
     }
 
-    private OpenTelemetryEnvelope? _currentEnvelope;
+    // public override void SendMessage(Envelope message)
+    // {
+    //     using var activity = OpenTelemetryHelpers.ActivitySource.StartActivity(nameof(SendMessage), ActivityKind.Server, _parentSpanId);
+    //     AddEvent(activity);
+    //     activity?.AddEvent(new ActivityEvent("Message: " + message));
+    //     base.SendMessage(message);
+    // }
+    //
+    // public override void SendMessage(IActorRef sender, object message)
+    // {
+    //     using var activity = OpenTelemetryHelpers.ActivitySource.StartActivity(nameof(SendMessage), ActivityKind.Server, _parentSpanId);
+    //     AddEvent(activity);
+    //     activity?.AddEvent(new ActivityEvent("Message: " + message));
+    //     base.SendMessage(sender, message);
+    // }
+
+    public override IActorRef ActorOf(Props props, string? name = null)
+    {
+        using var activity =
+            OpenTelemetryHelpers.ActivitySource.StartActivity(nameof(ActorOf), ActivityKind.Server, _parentSpanId!);
+        AddEvent(activity);
+        var res = base.ActorOf(props, name);
+        activity?.AddEvent(new ActivityEvent("Spawned Child: " + res));
+
+        return res;
+    }
+
+    public new ActorSelection ActorSelection(string actorPath)
+    {
+        var selection = base.ActorSelection(actorPath);
+        var tracableAnchor = new ActorSelectionAnchorActorRef((selection.Anchor as IInternalActorRef)!);
+        var x = new ActorSelection(tracableAnchor, selection.Path);
+        return x;
+    }
+
     protected override void ReceiveMessage(object message)
     {
         //non augmented message, just pass it on
@@ -36,10 +72,7 @@ public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
 
         if (_openTelemetrySettings.EnableTracing)
         {
-            if (Activity.Current != null)
-            {
-                _parentSpanId = Activity.Current.Id!;
-            }
+            if (Activity.Current != null) _parentSpanId = Activity.Current.Id!;
 
             var propagationContext = envelope.Headers.ExtractPropagationContext();
 
@@ -63,7 +96,7 @@ public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
         }
     }
 
-    void ReceiveActivitySetup(Activity? activity, object message)
+    private void ReceiveActivitySetup(Activity? activity, object message)
     {
         activity?.SetTag(OtelTags.ActorType, Props.Type.Name)
             .SetTag(OtelTags.MessageType, message.GetTypeName())
@@ -73,14 +106,16 @@ public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
 
     protected override void PreStart()
     {
-        using var activity = OpenTelemetryHelpers.ActivitySource.StartActivity(nameof(PreStart), ActivityKind.Server, _parentSpanId!);
+        using var activity =
+            OpenTelemetryHelpers.ActivitySource.StartActivity(nameof(PreStart), ActivityKind.Server, _parentSpanId!);
         AddEvent(activity);
         base.PreStart();
     }
 
     public override void Start()
     {
-        using var activity = OpenTelemetryHelpers.ActivitySource.StartActivity(nameof(Start), ActivityKind.Server, _parentSpanId!);
+        using var activity =
+            OpenTelemetryHelpers.ActivitySource.StartActivity(nameof(Start), ActivityKind.Server, _parentSpanId!);
         AddEvent(activity);
         base.Start();
     }
@@ -93,7 +128,7 @@ public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
     //     return res;
     // }
 
-    private void AddEvent(Activity? activity,[CallerMemberName]string callerName ="")
+    private void AddEvent(Activity? activity, [CallerMemberName] string callerName = "")
     {
         activity?.AddEvent(new ActivityEvent(callerName));
         activity?.AddTag(OtelTags.ActorType, Props.Type.Name);
@@ -101,50 +136,20 @@ public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
 
     protected override void AutoReceiveMessage(Envelope envelope)
     {
-        using var activity = OpenTelemetryHelpers.ActivitySource.StartActivity(nameof(AutoReceiveMessage), ActivityKind.Server, _parentSpanId!);
+        using var activity =
+            OpenTelemetryHelpers.ActivitySource.StartActivity(nameof(AutoReceiveMessage), ActivityKind.Server,
+                _parentSpanId!);
         AddEvent(activity);
         base.AutoReceiveMessage(envelope);
     }
 
-    // public override void SendMessage(Envelope message)
-    // {
-    //     using var activity = OpenTelemetryHelpers.ActivitySource.StartActivity(nameof(SendMessage), ActivityKind.Server, _parentSpanId);
-    //     AddEvent(activity);
-    //     activity?.AddEvent(new ActivityEvent("Message: " + message));
-    //     base.SendMessage(message);
-    // }
-    //
-    // public override void SendMessage(IActorRef sender, object message)
-    // {
-    //     using var activity = OpenTelemetryHelpers.ActivitySource.StartActivity(nameof(SendMessage), ActivityKind.Server, _parentSpanId);
-    //     AddEvent(activity);
-    //     activity?.AddEvent(new ActivityEvent("Message: " + message));
-    //     base.SendMessage(sender, message);
-    // }
-
-    public override IActorRef ActorOf(Props props, string? name = null)
-    {
-        using var activity = OpenTelemetryHelpers.ActivitySource.StartActivity(nameof(ActorOf), ActivityKind.Server, _parentSpanId!);
-        AddEvent(activity);
-        var res = base.ActorOf(props, name);
-        activity?.AddEvent(new ActivityEvent("Spawned Child: " + res));
-
-        return res;
-    }
-
     public override void SendSystemMessage(ISystemMessage systemMessage)
     {
-        using var activity = OpenTelemetryHelpers.ActivitySource.StartActivity(nameof(SendSystemMessage), ActivityKind.Server, _parentSpanId!);
+        using var activity =
+            OpenTelemetryHelpers.ActivitySource.StartActivity(nameof(SendSystemMessage), ActivityKind.Server,
+                _parentSpanId!);
         AddEvent(activity);
         activity?.AddEvent(new ActivityEvent("SystemMessage: " + systemMessage));
         base.SendSystemMessage(systemMessage);
-    }
-
-    public new ActorSelection ActorSelection(string actorPath)
-    {
-        var selection = base.ActorSelection(actorPath);
-        var tracableAnchor = new ActorSelectionAnchorActorRef((selection.Anchor as IInternalActorRef)!);
-        var x = new ActorSelection(tracableAnchor, selection.Path);
-        return x;
     }
 }

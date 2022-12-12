@@ -6,7 +6,6 @@ using OpenTelemetry.Context.Propagation;
 
 namespace Akka.OpenTelemetry.Telemetry;
 
-
 public static class OpenTelemetryHelpers
 {
     public static readonly ActivitySource ActivitySource = new(OtelTags.ActivitySourceName);
@@ -31,10 +30,7 @@ public static class OpenTelemetryHelpers
         var tags = new[] { new KeyValuePair<string, object?>(OtelTags.MessageType, messageType) };
         var activity = ActivitySource.StartActivity(name, activityKind, parent, tags);
 
-        if (activity is not null)
-        {
-            activitySetup(activity, message!);
-        }
+        if (activity is not null) activitySetup(activity, message!);
 
         return activity;
     }
@@ -49,27 +45,28 @@ public static class OpenTelemetryHelpers
         return context.ToDictionary(x => x.Key, x => x.Value);
     }
 
-    public static PropagationContext ExtractPropagationContext(this Dictionary<string, string> headers) =>
-        Propagators.DefaultTextMapPropagator.Extract(default, headers,
+    public static PropagationContext ExtractPropagationContext(this Dictionary<string, string> headers)
+    {
+        return Propagators.DefaultTextMapPropagator.Extract(default, headers,
             (dictionary, key) => dictionary.TryGetValue(key, out var value) ? new[] { value } : Array.Empty<string>()
         );
+    }
 
-    private static void AddHeader(List<KeyValuePair<string, string>> list, string key, string value) =>
+    private static void AddHeader(List<KeyValuePair<string, string>> list, string key, string value)
+    {
         list.Add(new KeyValuePair<string, string>(key, value));
+    }
 
     public static OpenTelemetryEnvelope ExtractHeaders(object message, Props props)
     {
         var activity = Activity.Current;
-        if (activity is null)
-        {
-            return new OpenTelemetryEnvelope(message, Headers.Empty);
-        }
+        if (activity is null) return new OpenTelemetryEnvelope(message, Headers.Empty);
 
         var actorRefTag = Activity.Current?.GetTagItem(OtelTags.ActorRef)?.ToString() ?? "NoSender";
 
-        using var tellActivity = OpenTelemetryHelpers.BuildStartedActivity(activity.Context, actorRefTag, "Tell",
+        using var tellActivity = BuildStartedActivity(activity.Context, actorRefTag, "Tell",
             message,
-            OpenTelemetryHelpers.DefaultSetupActivity);
+            DefaultSetupActivity);
         tellActivity?.AddTag(OtelTags.ActorType, props.Type.Name);
         var headers = Activity.Current?.Context.GetPropagationHeaders();
         var envelope = new OpenTelemetryEnvelope(message, headers ?? Headers.Empty);
@@ -78,10 +75,7 @@ public static class OpenTelemetryHelpers
 
     public static object ExtractHeaders(object message)
     {
-        if (message is OpenTelemetryEnvelope alreadyEnvelope)
-        {
-            return alreadyEnvelope;
-        }
+        if (message is OpenTelemetryEnvelope alreadyEnvelope) return alreadyEnvelope;
 
         //special case, apply envelope to inner message
         if (message is ActorSelectionMessage selectionMessage)
@@ -94,15 +88,12 @@ public static class OpenTelemetryHelpers
         else
         {
             var activity = Activity.Current;
-            if (activity is null)
-            {
-                return new OpenTelemetryEnvelope(message, Headers.Empty);
-            }
+            if (activity is null) return new OpenTelemetryEnvelope(message, Headers.Empty);
 
             var current = Activity.Current?.GetTagItem(OtelTags.ActorType)?.ToString() ?? "NoSender";
-            using var tellActivity = OpenTelemetryHelpers.BuildStartedActivity(activity.Context, current , "Tell",
+            using var tellActivity = BuildStartedActivity(activity.Context, current, "Tell",
                 message,
-                OpenTelemetryHelpers.DefaultSetupActivity);
+                DefaultSetupActivity);
             tellActivity?.AddTag(OtelTags.ActorType, current);
             var headers = Activity.Current?.Context.GetPropagationHeaders();
             var envelope = new OpenTelemetryEnvelope(message, headers ?? Headers.Empty);
