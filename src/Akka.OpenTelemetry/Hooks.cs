@@ -43,4 +43,9 @@ public class Hooks
       //  Console.WriteLine($"Auto received message {message} on {actorRef} from {sender}");
 
     }
+
+    public void ActorChildSpawned(Props props, IActorRef child, IActorRef parent)
+    {
+      //  Console.WriteLine($"Child {child} spawned with props {props} by parent {parent}");
+    }
 }

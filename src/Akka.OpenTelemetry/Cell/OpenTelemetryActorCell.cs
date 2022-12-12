@@ -48,6 +48,9 @@ public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
         var res = base.ActorOf(props, name);
         activity?.AddEvent(new ActivityEvent("Spawned Child: " + res));
 
+
+        System.Hooks().ActorChildSpawned(props, res, Self);
+
         return res;
     }
 
