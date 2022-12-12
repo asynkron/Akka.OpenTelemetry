@@ -1,11 +1,11 @@
 using Akka.Actor;
 using Akka.Configuration;
-using Akka.OpenTelemetry;
+using Akka.OpenTelemetry.Telemetry;
 using OpenTelemetry.Trace;
 
 namespace Akka;
 
-public static class TypeExtensions
+public static class Extensions
 {
     public static TracerProviderBuilder AddAkkaInstrumentation(this TracerProviderBuilder builder) =>
         builder.AddSource(OtelTags.ActivitySourceName);

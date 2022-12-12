@@ -9,6 +9,7 @@ using Akka;
 using Akka.Actor;
 using Akka.Configuration;
 using ChatMessages;
+using ChatServer;
 using OpenTelemetry;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -44,45 +45,48 @@ using var system = ActorSystem.Create("MyServer", config);
 var props = Props.Create(() => new ChatServerActor());
 system.ActorOf(props, "ChatServer");
 
-tracerProvider.ForceFlush();
+tracerProvider?.ForceFlush();
 Console.ReadLine();
 
 
-internal class ChatServerActor : ReceiveActor, ILogReceive
+namespace ChatServer
 {
-    private readonly HashSet<IActorRef> _clients = new();
-
-    public ChatServerActor()
+    internal class ChatServerActor : ReceiveActor, ILogReceive
     {
-        Receive<SayRequest>(message =>
-        {
-            var response = new SayResponse
-            {
-                Username = message.Username,
-                Text = message.Text
-            };
-            foreach (var client in _clients) client.Tell(response, Self);
-        });
+        private readonly HashSet<IActorRef> _clients = new();
 
-        Receive<ConnectRequest>(message =>
+        public ChatServerActor()
         {
-            _clients.Add(Sender);
-            Console.WriteLine("Client connected " + Sender);
-            Sender.Tell(new ConnectResponse
+            Receive<SayRequest>(message =>
             {
-                Message = "Hello and welcome to Akka.NET chat example"
-            }, Self);
-        });
+                var response = new SayResponse
+                {
+                    Username = message.Username,
+                    Text = message.Text
+                };
+                foreach (var client in _clients) client.Tell(response, Self);
+            });
 
-        Receive<NickRequest>(message =>
-        {
-            var response = new NickResponse
+            Receive<ConnectRequest>(message =>
             {
-                OldUsername = message.OldUsername,
-                NewUsername = message.NewUsername
-            };
+                _clients.Add(Sender);
+                Console.WriteLine("Client connected " + Sender);
+                Sender.Tell(new ConnectResponse
+                {
+                    Message = "Hello and welcome to Akka.NET chat example"
+                }, Self);
+            });
 
-            foreach (var client in _clients) client.Tell(response, Self);
-        });
+            Receive<NickRequest>(message =>
+            {
+                var response = new NickResponse
+                {
+                    OldUsername = message.OldUsername,
+                    NewUsername = message.NewUsername
+                };
+
+                foreach (var client in _clients) client.Tell(response, Self);
+            });
+        }
     }
 }

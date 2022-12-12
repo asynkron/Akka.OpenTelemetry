@@ -2,8 +2,9 @@ using Akka.Actor;
 using Akka.Actor.Internal;
 using Akka.Dispatch;
 using Akka.OpenTelemetry.Cell;
+using Akka.OpenTelemetry.Telemetry;
 
-namespace Akka.OpenTelemetry.Local.ActorRefs;
+namespace Akka.OpenTelemetry.Local;
 
 public class OpenTelemetryLocalActorRef : LocalActorRef
 {
@@ -16,7 +17,7 @@ public class OpenTelemetryLocalActorRef : LocalActorRef
 
     protected override void TellInternal(object message, IActorRef sender)
     {
-        var envelope = TraceTell.ExtractHeaders(message, Props);
+        var envelope = OpenTelemetryHelpers.ExtractHeaders(message, Props);
         base.TellInternal(envelope, sender);
     }
 

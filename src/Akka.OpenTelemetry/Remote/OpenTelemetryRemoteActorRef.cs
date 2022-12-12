@@ -1,4 +1,5 @@
 using Akka.Actor;
+using Akka.OpenTelemetry.Telemetry;
 using Akka.Remote;
 
 namespace Akka.OpenTelemetry.Remote;
@@ -7,7 +8,7 @@ public class OpenTelemetryRemoteActorRef : RemoteActorRef
 {
     protected override void TellInternal(object message, IActorRef sender)
     {
-        var envelope = TraceTell.ExtractHeaders(message);
+        var envelope = OpenTelemetryHelpers.ExtractHeaders(message);
         base.TellInternal(envelope,sender);
     }
 

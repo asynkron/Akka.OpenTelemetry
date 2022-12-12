@@ -6,9 +6,10 @@
 //-----------------------------------------------------------------------
 
 namespace ChatMessages;
-
+#pragma warning disable CS8618
 public class ConnectRequest
 {
+
     public string Username { get; set; }
 }
 
@@ -40,3 +41,4 @@ public class SayResponse
     public string Username { get; set; }
     public string Text { get; set; }
 }
+#pragma warning restore CS8618

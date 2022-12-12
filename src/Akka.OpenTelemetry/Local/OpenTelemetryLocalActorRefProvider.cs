@@ -1,13 +1,12 @@
 using Akka.Actor;
 using Akka.Actor.Internal;
-using Akka.Decorators;
 using Akka.Event;
 using JetBrains.Annotations;
 
 namespace Akka.OpenTelemetry.Local;
 
 [UsedImplicitly]
-public sealed class OpenTelemetryLocalActorRefProvider : ActorRefProviderDecorator
+public sealed class OpenTelemetryLocalActorRefProvider : LocalActorRefProviderDecorator
 {
     public OpenTelemetryLocalActorRefProvider(string systemName, Settings settings, EventStream eventStream)
     {
@@ -24,14 +23,14 @@ public sealed class OpenTelemetryLocalActorRefProvider : ActorRefProviderDecorat
         ActorPath path,
         bool systemService, Deploy deploy, bool lookupDeploy, bool async)
     {
-        if (Spawner.NotTraced(props, systemService, path))
+        if (ActorOfUtils.NotTraced(props, systemService, path))
         {
             Console.WriteLine("Not traced " + path);
             return base.ActorOf(system, props, supervisor, path, systemService, deploy, lookupDeploy, async);
         }
 
         //reuse the spawn logic
-        return Spawner.LocalActorOf(system, props, supervisor, path, deploy, lookupDeploy, async);
+        return ActorOfUtils.LocalActorOf(system, props, supervisor, path, deploy, lookupDeploy, async);
     }
 
 }

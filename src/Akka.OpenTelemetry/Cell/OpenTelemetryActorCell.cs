@@ -5,13 +5,14 @@ using Akka.Actor.Internal;
 using Akka.Dispatch;
 using Akka.Dispatch.SysMsg;
 using Akka.OpenTelemetry.Local;
+using Akka.OpenTelemetry.Telemetry;
 
 namespace Akka.OpenTelemetry.Cell;
 
 public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
 {
     private readonly OpenTelemetrySettings _openTelemetrySettings;
-    private string _parentSpanId;
+    private string? _parentSpanId;
 
     public OpenTelemetryActorCell(ActorSystemImpl system, IInternalActorRef self, Props props,
         MessageDispatcher dispatcher, IInternalActorRef parent) : base(system, self, props, dispatcher, parent)
@@ -72,14 +73,14 @@ public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
 
     protected override void PreStart()
     {
-        using var activity = OpenTelemetryHelpers.ActivitySource.StartActivity(nameof(PreStart), ActivityKind.Server, _parentSpanId);
+        using var activity = OpenTelemetryHelpers.ActivitySource.StartActivity(nameof(PreStart), ActivityKind.Server, _parentSpanId!);
         AddEvent(activity);
         base.PreStart();
     }
 
     public override void Start()
     {
-        using var activity = OpenTelemetryHelpers.ActivitySource.StartActivity(nameof(Start), ActivityKind.Server, _parentSpanId);
+        using var activity = OpenTelemetryHelpers.ActivitySource.StartActivity(nameof(Start), ActivityKind.Server, _parentSpanId!);
         AddEvent(activity);
         base.Start();
     }
@@ -101,7 +102,7 @@ public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
     protected override void AutoReceiveMessage(Envelope envelope)
     {
         Console.WriteLine("AroundReceive");
-        using var activity = OpenTelemetryHelpers.ActivitySource.StartActivity(nameof(AutoReceiveMessage), ActivityKind.Server, _parentSpanId);
+        using var activity = OpenTelemetryHelpers.ActivitySource.StartActivity(nameof(AutoReceiveMessage), ActivityKind.Server, _parentSpanId!);
         AddEvent(activity);
         base.AutoReceiveMessage(envelope);
     }
@@ -122,9 +123,9 @@ public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
     //     base.SendMessage(sender, message);
     // }
 
-    public override IActorRef ActorOf(Props props, string name = null)
+    public override IActorRef ActorOf(Props props, string? name = null)
     {
-        using var activity = OpenTelemetryHelpers.ActivitySource.StartActivity(nameof(ActorOf), ActivityKind.Server, _parentSpanId);
+        using var activity = OpenTelemetryHelpers.ActivitySource.StartActivity(nameof(ActorOf), ActivityKind.Server, _parentSpanId!);
         AddEvent(activity);
         var res = base.ActorOf(props, name);
         activity?.AddEvent(new ActivityEvent("Spawned Child: " + res));
@@ -134,7 +135,7 @@ public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
 
     public override void SendSystemMessage(ISystemMessage systemMessage)
     {
-        using var activity = OpenTelemetryHelpers.ActivitySource.StartActivity(nameof(SendSystemMessage), ActivityKind.Server, _parentSpanId);
+        using var activity = OpenTelemetryHelpers.ActivitySource.StartActivity(nameof(SendSystemMessage), ActivityKind.Server, _parentSpanId!);
         AddEvent(activity);
         activity?.AddEvent(new ActivityEvent("SystemMessage: " + systemMessage));
         base.SendSystemMessage(systemMessage);

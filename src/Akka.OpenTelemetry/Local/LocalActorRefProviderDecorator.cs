@@ -2,9 +2,9 @@
 using Akka.Actor.Internal;
 using Akka.Serialization;
 
-namespace Akka.Decorators;
+namespace Akka.OpenTelemetry.Local;
 
-public abstract class ActorRefProviderDecorator : IActorRefProvider
+public abstract class LocalActorRefProviderDecorator : IActorRefProvider
 {
     protected IActorRefProvider Inner = default!;
     public virtual IActorRef DeadLetters => Inner.DeadLetters;

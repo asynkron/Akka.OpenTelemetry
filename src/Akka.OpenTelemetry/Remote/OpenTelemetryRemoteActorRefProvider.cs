@@ -1,8 +1,6 @@
 using Akka.Actor;
 using Akka.Actor.Internal;
-using Akka.Decorators;
 using Akka.Event;
-using Akka.Remote;
 using JetBrains.Annotations;
 
 namespace Akka.OpenTelemetry.Remote;
@@ -26,7 +24,7 @@ public sealed class OpenTelemetryRemoteActorRefProvider: RemoteActorRefProviderD
         ActorPath path,
         bool systemService, Deploy deploy, bool lookupDeploy, bool async)
     {
-        if (Spawner.NotTraced(props, systemService, path))
+        if (ActorOfUtils.NotTraced(props, systemService, path))
         {
             Console.WriteLine("Not traced " + path);
             return base.ActorOf(system, props, supervisor, path, systemService, deploy, lookupDeploy, async);
@@ -35,6 +33,6 @@ public sealed class OpenTelemetryRemoteActorRefProvider: RemoteActorRefProviderD
         //TODO: figure out what to do with remote deployments here...
 
         //reuse the spawn logic
-        return Spawner.LocalActorOf(system, props, supervisor, path, deploy, lookupDeploy, async);
+        return ActorOfUtils.LocalActorOf(system, props, supervisor, path, deploy, lookupDeploy, async);
     }
 }

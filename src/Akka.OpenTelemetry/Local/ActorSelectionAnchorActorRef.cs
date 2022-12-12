@@ -1,5 +1,6 @@
 using Akka.Actor;
 using Akka.Dispatch.SysMsg;
+using Akka.OpenTelemetry.Telemetry;
 using Akka.Util;
 
 namespace Akka.OpenTelemetry.Local;
@@ -11,11 +12,11 @@ public class ActorSelectionAnchorActorRef : IInternalActorRef
 
     public void Tell(object message, IActorRef sender)
     {
-        //if message is an actorselection message, unwrap it, extract current headers, and rebake a new one
+        //if message is an ActorSelection message, unwrap it, extract current headers, and rebake a new one
         if (message is ActorSelectionMessage asl)
         {
             var m = asl.Message;
-            var envelope = TraceTell.ExtractHeaders(m);
+            var envelope = OpenTelemetryHelpers.ExtractHeaders(m);
             var a = new ActorSelectionMessage(envelope, asl.Elements, asl.WildCardFanOut);
             _inner.Tell(a, sender);
             return;
@@ -31,7 +32,7 @@ public class ActorSelectionAnchorActorRef : IInternalActorRef
     public ActorPath Path => _inner.Path;
     public bool IsLocal  => _inner.IsLocal;
     public IActorRef GetChild(IReadOnlyList<string> name) => _inner.GetChild(name);
-    public void Resume(Exception causedByFailure = null) => _inner.Resume(causedByFailure);
+    public void Resume(Exception? causedByFailure = null) => _inner.Resume(causedByFailure);
     public void Start() => _inner.Start();
     public void Stop() => _inner.Stop();
     public void Restart(Exception cause) => _inner.Restart(cause);

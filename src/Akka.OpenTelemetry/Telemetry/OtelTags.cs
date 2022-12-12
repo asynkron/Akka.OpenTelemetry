@@ -1,4 +1,4 @@
-﻿namespace Akka.OpenTelemetry;
+﻿namespace Akka.OpenTelemetry.Telemetry;
 
 public static class OtelTags
 {

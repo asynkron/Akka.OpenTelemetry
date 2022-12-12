@@ -1,14 +1,13 @@
 using Akka.Actor;
 using Akka.Actor.Internal;
-using Akka.Cluster;
 using Akka.Remote;
 using Akka.Serialization;
 
-namespace Akka.Decorators;
+namespace Akka.OpenTelemetry.Remote;
 
-public class ClusterActorRefProviderDecorator :  IClusterActorRefProvider
+public class RemoteActorRefProviderDecorator : IRemoteActorRefProvider
 {
-    protected IClusterActorRefProvider Inner = default!;
+    protected IRemoteActorRefProvider Inner = default!;
     public virtual IActorRef DeadLetters => Inner.DeadLetters;
     public virtual IActorRef IgnoreRef => Inner.IgnoreRef;
     public virtual ActorPath RootPath => Inner.RootPath;
@@ -16,7 +15,20 @@ public class ClusterActorRefProviderDecorator :  IClusterActorRefProvider
     public virtual Deployer Deployer => Inner.Deployer;
     public virtual IInternalActorRef TempContainer => Inner.TempContainer;
     public virtual Task TerminationTask => Inner.TerminationTask;
-    public virtual Address DefaultAddress => Inner.DefaultAddress;
+    public virtual Address DefaultAddress
+    {
+        get
+        {
+            //TODO: race condition here?
+            if (Inner.DefaultAddress is null)
+            {
+                Console.WriteLine("Inner is null");
+                SpinWait.SpinUntil(() => Inner.DefaultAddress != null);
+            }
+            return Inner.DefaultAddress!;
+        }
+    }
+
     public virtual Information SerializationInformation => Inner.SerializationInformation;
     public virtual IInternalActorRef RootGuardian => Inner.RootGuardian;
     public virtual LocalActorRef Guardian => Inner.Guardian;

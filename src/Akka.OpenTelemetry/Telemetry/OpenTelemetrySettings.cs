@@ -1,3 +1,3 @@
-namespace Akka.OpenTelemetry;
+namespace Akka.OpenTelemetry.Telemetry;
 
 public record OpenTelemetrySettings(bool EnableTracing);

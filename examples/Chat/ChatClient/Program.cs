@@ -9,7 +9,8 @@ using System.Diagnostics;
 using Akka;
 using Akka.Actor;
 using Akka.Configuration;
-using Akka.OpenTelemetry;
+using Akka.OpenTelemetry.Telemetry;
+using ChatClient;
 using ChatMessages;
 using OpenTelemetry;
 using OpenTelemetry.Resources;
@@ -57,7 +58,7 @@ using (var activity = source.StartActivity("demo", ActivityKind.Client))
     while (true)
     {
         var input = Console.ReadLine();
-        if (input.StartsWith("/"))
+        if (input!.StartsWith("/"))
         {
             var parts = input.Split(' ');
             var cmd = parts[0].ToLowerInvariant();
@@ -84,50 +85,53 @@ using (var activity = source.StartActivity("demo", ActivityKind.Client))
     }
 }
 
-tracerProvider.ForceFlush();
+tracerProvider?.ForceFlush();
 system.Terminate().Wait();
 
 
-internal class ChatClientActor : ReceiveActor, ILogReceive
+namespace ChatClient
 {
-    private readonly ActorSelection _server =
-        Context.ActorSelection("akka.tcp://MyServer@localhost:8081/user/ChatServer");
-
-    private string _nick = "Roggan";
-
-    public ChatClientActor()
+    internal class ChatClientActor : ReceiveActor, ILogReceive
     {
-        Receive<ConnectRequest>(cr =>
-        {
-            Console.WriteLine("Connecting....");
-            _server.Tell(cr);
-        });
+        private readonly ActorSelection _server =
+            Context.ActorSelection("akka.tcp://MyServer@localhost:8081/user/ChatServer");
 
-        Receive<ConnectResponse>(rsp =>
-        {
-            Console.WriteLine("Connected!");
-            Console.WriteLine(rsp.Message);
-        });
+        private string _nick = "Roggan";
 
-        Receive<NickRequest>(nr =>
+        public ChatClientActor()
         {
-            nr.OldUsername = _nick;
-            Console.WriteLine("Changing nick to {0}", nr.NewUsername);
-            _nick = nr.NewUsername;
-            _server.Tell(nr);
-        });
+            Receive<ConnectRequest>(cr =>
+            {
+                Console.WriteLine("Connecting....");
+                _server.Tell(cr);
+            });
 
-        Receive<NickResponse>(nrsp =>
-        {
-            Console.WriteLine("{0} is now known as {1}", nrsp.OldUsername, nrsp.NewUsername);
-        });
+            Receive<ConnectResponse>(rsp =>
+            {
+                Console.WriteLine("Connected!");
+                Console.WriteLine(rsp.Message);
+            });
 
-        Receive<SayRequest>(sr =>
-        {
-            sr.Username = _nick;
-            _server.Tell(sr);
-        });
+            Receive<NickRequest>(nr =>
+            {
+                nr.OldUsername = _nick;
+                Console.WriteLine("Changing nick to {0}", nr.NewUsername);
+                _nick = nr.NewUsername;
+                _server.Tell(nr);
+            });
 
-        Receive<SayResponse>(srsp => { Console.WriteLine("{0}: {1}", srsp.Username, srsp.Text); });
+            Receive<NickResponse>(nrsp =>
+            {
+                Console.WriteLine("{0} is now known as {1}", nrsp.OldUsername, nrsp.NewUsername);
+            });
+
+            Receive<SayRequest>(sr =>
+            {
+                sr.Username = _nick;
+                _server.Tell(sr);
+            });
+
+            Receive<SayResponse>(srsp => { Console.WriteLine("{0}: {1}", srsp.Username, srsp.Text); });
+        }
     }
 }

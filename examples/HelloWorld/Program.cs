@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using Akka;
 using Akka.Actor;
-using Akka.OpenTelemetry;
+using Akka.OpenTelemetry.Telemetry;
 using Demo;
 using OpenTelemetry;
 using OpenTelemetry.Resources;
