@@ -1,5 +1,6 @@
 using Akka.Actor;
 using Akka.Configuration;
+using Akka.OpenTelemetry;
 using Akka.OpenTelemetry.Telemetry;
 using OpenTelemetry.Trace;
 
@@ -28,4 +29,6 @@ akka.actor.provider = "Akka.OpenTelemetry.Local.OpenTelemetryLocalActorRefProvid
 
         return bootstrap;
     }
+
+    public static Hooks Hooks(this ActorSystem system) => Otel.For(system).Hooks;
 }

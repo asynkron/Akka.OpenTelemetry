@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Akka.Actor;
+using Akka.Actor.Internal;
 using OpenTelemetry;
 using OpenTelemetry.Context.Propagation;
 
@@ -97,6 +98,7 @@ public static class OpenTelemetryHelpers
             tellActivity?.AddTag(OtelTags.ActorType, current);
             var headers = Activity.Current?.Context.GetPropagationHeaders();
             var envelope = new OpenTelemetryEnvelope(message, headers ?? Headers.Empty);
+
             return envelope;
         }
     }

@@ -1,31 +1,46 @@
 using Akka.Actor;
+using Akka.Dispatch.SysMsg;
 
 namespace Akka.OpenTelemetry;
 
 public class Hooks
 {
-    public Task ActorSpawned(IActorContext context)
+    public void ActorRestarted(IActorRef actorRef)
     {
-        return Task.CompletedTask;
+
     }
 
-    public Task ActorRestarted(IActorContext context)
+    public void ActorStopped(IActorRef actorRef)
     {
-        return Task.CompletedTask;
+
     }
 
-    public Task ActorStopped(IActorContext context)
+    public void ActorReceivedMessage(object message, IActorRef actorRef)
     {
-        return Task.CompletedTask;
+      //  Console.WriteLine($"Received message {message} on {actorRef}");
+
     }
 
-    public Task ActorReceivedMessage(IActorContext context, object message)
+    public void ActorSendMessage(object message, IActorRef actorRef, IActorRef target, IActorRef sender)
     {
-        return Task.CompletedTask;
+      //  Console.WriteLine($"Sending message {message} from {actorRef} to {target} with sender {sender}");
     }
 
-    public Task ActorSentMessage(IActorContext context, object message, IActorRef target)
+    public void ActorSendSystemMessage(ISystemMessage message, IActorRef actorRef)
     {
-        return Task.CompletedTask;
+      //  Console.WriteLine($"Sending system message {message} from {actorRef}");
+
+    }
+
+    public void ActorSpawned(Props props, IInternalActorRef actorRef)
+    {
+      //  Console.WriteLine($"Spawned actor {actorRef} with props {props}");
+
+    }
+
+    public void ActorAutoReceiveMessage(object message, IActorRef actorRef, IActorRef sender)
+    {
+      //  Console.WriteLine($"Auto received message {message} on {actorRef} from {sender}");
+
     }
 }

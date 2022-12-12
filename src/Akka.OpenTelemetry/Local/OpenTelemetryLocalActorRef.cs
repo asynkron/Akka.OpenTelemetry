@@ -20,6 +20,12 @@ public class OpenTelemetryLocalActorRef : LocalActorRef
     protected override void TellInternal(object message, IActorRef sender)
     {
         var envelope = OpenTelemetryHelpers.ExtractHeaders(message, Props);
+        if (InternalCurrentActorCellKeeper.Current != null)
+        {
+            var system = InternalCurrentActorCellKeeper.Current.System;
+            var self = InternalCurrentActorCellKeeper.Current.Self;
+            system.Hooks().ActorSendMessage(message, self, this, sender);
+        }
         base.TellInternal(envelope, sender);
     }
 

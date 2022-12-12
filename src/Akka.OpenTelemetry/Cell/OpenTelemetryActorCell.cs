@@ -88,12 +88,18 @@ public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
 
             _parentSpanId = activity?.Id ?? "";
             //shady, yes, but we need to trigger receive timeout etc.
-            Invoke(new Envelope(envelope.Message, Sender, System));
+            ReceiveInner(envelope);
         }
         else
         {
-            Invoke(new Envelope(envelope.Message, Sender, System));
+            ReceiveInner(envelope);
         }
+    }
+
+    private void ReceiveInner(OpenTelemetryEnvelope envelope)
+    {
+        Invoke(new Envelope(envelope.Message, Sender, System));
+        System.Hooks().ActorReceivedMessage(envelope.Message, Self);
     }
 
     private void ReceiveActivitySetup(Activity? activity, object message)
@@ -120,6 +126,11 @@ public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
         base.Start();
     }
 
+    public override void SendMessage(Envelope message)
+    {
+        base.SendMessage(message);
+    }
+
     // protected override ActorBase CreateNewActorInstance()
     // {
     //     using var activity = OpenTelemetryHelpers.ActivitySource.StartActivity(nameof(CreateNewActorInstance), ActivityKind.Server, _parentSpanId);
@@ -140,6 +151,7 @@ public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
             OpenTelemetryHelpers.ActivitySource.StartActivity(nameof(AutoReceiveMessage), ActivityKind.Server,
                 _parentSpanId!);
         AddEvent(activity);
+        System.Hooks().ActorAutoReceiveMessage(envelope.Message, Self, envelope.Sender);
         base.AutoReceiveMessage(envelope);
     }
 
@@ -150,6 +162,7 @@ public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
                 _parentSpanId!);
         AddEvent(activity);
         activity?.AddEvent(new ActivityEvent("SystemMessage: " + systemMessage));
+        System.Hooks().ActorSendSystemMessage(systemMessage, Self);
         base.SendSystemMessage(systemMessage);
     }
 }

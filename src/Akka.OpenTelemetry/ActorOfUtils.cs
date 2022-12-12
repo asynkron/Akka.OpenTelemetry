@@ -1,6 +1,7 @@
 using Akka.Actor;
 using Akka.Actor.Internal;
 using Akka.Configuration;
+using Akka.OpenTelemetry;
 using Akka.OpenTelemetry.Local;
 using Akka.OpenTelemetry.Telemetry;
 
@@ -36,13 +37,17 @@ public static class ActorOfUtils
             var mailboxType = system.Mailboxes.GetMailboxType(props, dispatcher.Configurator.Config);
 
             var settings = new OpenTelemetrySettings(true);
-            return async switch
+            IInternalActorRef reff = async switch
             {
                 true => new OpenTelemetryRepointableActorRef(settings, system, props2, dispatcher, mailboxType,
                     supervisor,
                     path).Initialize(async),
                 _ => new OpenTelemetryLocalActorRef(settings, system, props, dispatcher, mailboxType, supervisor, path)
             };
+
+            system.Hooks().ActorSpawned(props, reff);
+
+            return reff;
         }
         catch (Exception ex)
         {
