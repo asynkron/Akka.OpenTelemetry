@@ -19,10 +19,9 @@ public class RemoteActorRefProviderDecorator : IRemoteActorRefProvider
     {
         get
         {
-            //TODO: race condition here?
+            //HACK: race condition here. just spin until set
             if (Inner.DefaultAddress is null)
             {
-                Console.WriteLine("Inner is null");
                 SpinWait.SpinUntil(() => Inner.DefaultAddress != null);
             }
             return Inner.DefaultAddress!;

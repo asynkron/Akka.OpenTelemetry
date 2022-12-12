@@ -101,7 +101,6 @@ public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
 
     protected override void AutoReceiveMessage(Envelope envelope)
     {
-        Console.WriteLine("AroundReceive");
         using var activity = OpenTelemetryHelpers.ActivitySource.StartActivity(nameof(AutoReceiveMessage), ActivityKind.Server, _parentSpanId!);
         AddEvent(activity);
         base.AutoReceiveMessage(envelope);
@@ -143,7 +142,6 @@ public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
 
     public new ActorSelection ActorSelection(string actorPath)
     {
-        Console.WriteLine("getting here?");
         var selection = base.ActorSelection(actorPath);
         var tracableAnchor = new ActorSelectionAnchorActorRef((selection.Anchor as IInternalActorRef)!);
         var x = new ActorSelection(tracableAnchor, selection.Path);

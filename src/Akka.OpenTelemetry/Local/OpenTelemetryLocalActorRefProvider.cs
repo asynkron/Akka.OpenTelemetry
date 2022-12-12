@@ -25,7 +25,6 @@ public sealed class OpenTelemetryLocalActorRefProvider : LocalActorRefProviderDe
     {
         if (ActorOfUtils.NotTraced(props, systemService, path))
         {
-            Console.WriteLine("Not traced " + path);
             return base.ActorOf(system, props, supervisor, path, systemService, deploy, lookupDeploy, async);
         }
 
