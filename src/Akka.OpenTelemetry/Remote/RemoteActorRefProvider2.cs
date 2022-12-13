@@ -4,7 +4,7 @@ using Akka.Remote;
 
 namespace Akka.OpenTelemetry.Remote;
 
-public class RemoteActorRefProvider2 : RemoteActorRefProvider
+public class RemoteActorRefProvider2 : RemoteActorRefProvider, IRemoteActorRefProvider
 {
     public RemoteActorRefProvider2(string systemName, Settings settings, EventStream eventStream) : base(systemName,
         settings, eventStream)

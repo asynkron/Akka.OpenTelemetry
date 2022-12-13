@@ -6,19 +6,14 @@ using JetBrains.Annotations;
 namespace Akka.OpenTelemetry.Local;
 
 [UsedImplicitly]
-public sealed class OpenTelemetryLocalActorRefProvider : LocalActorRefProviderDecorator
+public sealed class OpenTelemetryLocalActorRefProvider : LocalActorRefProviderProxy, IActorRefProvider
 {
-    public OpenTelemetryLocalActorRefProvider(string systemName, Settings settings, EventStream eventStream)
+    public OpenTelemetryLocalActorRefProvider(string systemName, Settings settings, EventStream eventStream) : base(new LocalActorRefProvider(systemName, settings,eventStream))
     {
-        Inner = new LocalActorRefProvider(systemName, settings, eventStream);
+
     }
 
-    public override void Init(ActorSystemImpl system)
-    {
-        Inner.Init(system);
-    }
-
-    public override IInternalActorRef ActorOf(ActorSystemImpl system, Props props, IInternalActorRef supervisor,
+    public new IInternalActorRef ActorOf(ActorSystemImpl system, Props props, IInternalActorRef supervisor,
         ActorPath path,
         bool systemService, Deploy deploy, bool lookupDeploy, bool async)
     {

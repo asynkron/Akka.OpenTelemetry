@@ -1,24 +1,21 @@
 using Akka.Actor;
 using Akka.Actor.Internal;
 using Akka.Event;
+using Akka.Remote;
 using JetBrains.Annotations;
 
 namespace Akka.OpenTelemetry.Remote;
 
 [UsedImplicitly]
-public sealed class OpenTelemetryRemoteActorRefProvider : RemoteActorRefProviderDecorator
+public sealed class OpenTelemetryRemoteActorRefProvider : IRemoteActorRefProviderProxy, IRemoteActorRefProvider
 {
-    public OpenTelemetryRemoteActorRefProvider(string systemName, Settings settings, EventStream eventStream)
+    public OpenTelemetryRemoteActorRefProvider(string systemName, Settings settings, EventStream eventStream) : base(
+        new RemoteActorRefProvider2(systemName, settings, eventStream))
     {
-        Inner = new RemoteActorRefProvider2(systemName, settings, eventStream);
+
     }
 
-    public override void Init(ActorSystemImpl system)
-    {
-        Inner.Init(system);
-    }
-
-    public override IInternalActorRef ActorOf(ActorSystemImpl system, Props props, IInternalActorRef supervisor,
+    public new IInternalActorRef ActorOf(ActorSystemImpl system, Props props, IInternalActorRef supervisor,
         ActorPath path,
         bool systemService, Deploy deploy, bool lookupDeploy, bool async)
     {
