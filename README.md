@@ -8,12 +8,13 @@ Tracing currently works for:
 * Local Actors
 * Remote Actors
 * ActorSelections
+* Async-Await, tracing does propagate across async boundaries
 
 And where it doesn't work:
 
 * Cluster Actors
 * Remote Deployed Actors
-* Async-Await, no tracing context is stored between async/await calls
+
 
 Akka.OpenTelemetry has been tested with Asynkron TraceView
 

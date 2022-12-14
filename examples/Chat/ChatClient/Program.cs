@@ -104,7 +104,6 @@ namespace ChatClient
             ReceiveAsync<ConnectRequest>(async cr =>
             {
                 Console.WriteLine("Connecting....");
-
                 var rsp = await _server.Ask<ConnectResponse>(cr);
                 Console.WriteLine("Connected!");
                 Console.WriteLine(rsp.Message);
