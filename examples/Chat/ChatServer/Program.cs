@@ -69,8 +69,8 @@ namespace ChatServer
 
             Receive<ConnectRequest>(message =>
             {
-                _clients.Add(Sender);
-                Console.WriteLine("Client connected " + Sender);
+                _clients.Add(message.Client);
+                Console.WriteLine("Client connected " + message.Client);
                 Sender.Tell(new ConnectResponse
                 {
                     Message = "Hello and welcome to Akka.NET chat example"

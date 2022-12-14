@@ -52,7 +52,8 @@ using (var activity = source.StartActivity("demo", ActivityKind.Client))
     activity?.SetTag("demo", "true");
     chatClient.Tell(new ConnectRequest
     {
-        Username = "Roggan"
+        Username = "Roggan",
+        Client = chatClient,
     });
 
     while (true)
@@ -100,17 +101,15 @@ namespace ChatClient
 
         public ChatClientActor()
         {
-            Receive<ConnectRequest>(cr =>
+            ReceiveAsync<ConnectRequest>(async cr =>
             {
                 Console.WriteLine("Connecting....");
-                _server.Tell(cr);
-            });
 
-            Receive<ConnectResponse>(rsp =>
-            {
+                var rsp = await _server.Ask<ConnectResponse>(cr);
                 Console.WriteLine("Connected!");
                 Console.WriteLine(rsp.Message);
             });
+
 
             Receive<NickRequest>(nr =>
             {

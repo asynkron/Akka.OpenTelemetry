@@ -22,10 +22,17 @@ public sealed class OpenTelemetryLocalActorRefProvider : LocalActorRefProviderDe
         ActorPath path,
         bool systemService, Deploy deploy, bool lookupDeploy, bool async)
     {
-        if (ActorOfUtils.NotTraced(props, systemService, path))
+        if (ActorOfUtils.NotTraced(systemService, path))
             return base.ActorOf(system, props, supervisor, path, systemService, deploy, lookupDeploy, async);
 
         //reuse the spawn logic
         return ActorOfUtils.LocalActorOf(system, props, supervisor, path, deploy, lookupDeploy, async);
     }
+
+    // public override FutureActorRef<T> CreateFutureRef<T>(TaskCompletionSource<T> tcs)
+    // {
+    //     var path = TempPath();
+    //     var future = new FutureActorRef<T>(tcs, path, this);
+    //     return future;
+    // }
 }

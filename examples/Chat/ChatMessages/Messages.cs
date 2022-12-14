@@ -5,12 +5,14 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using Akka.Actor;
+
 namespace ChatMessages;
 #pragma warning disable CS8618
 public class ConnectRequest
 {
-
     public string Username { get; set; }
+    public IActorRef Client { get; set; }
 }
 
 public class ConnectResponse

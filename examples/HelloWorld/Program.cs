@@ -31,9 +31,10 @@ using (var activity = source.StartActivity("demo", ActivityKind.Client))
     var reff = system.ActorOf(props);
 
     reff.Tell(new SpawnChild());
-    reff.Tell("Testing");
-    reff.Tell("Testing2");
-    reff.Tell("Testing3");
+    reff.Tell(new DoTell("Testing"));
+    reff.Tell(new DoTell("Testing2"));
+    reff.Tell(new DoTell("Testing3"));
+    await reff.Ask<AskResponse>(new AskRequest());
 
     reff.Tell(PoisonPill.Instance);
     await Task.Delay(100);
@@ -42,6 +43,10 @@ using (var activity = source.StartActivity("demo", ActivityKind.Client))
 tracerProvider!.ForceFlush();
 Console.ReadLine();
 
+public record DoTell(string Message);
+public record AskResponse();
+
+public record AskRequest();
 
 namespace Demo
 {
@@ -60,8 +65,12 @@ namespace Demo
                     reff.Tell("hello");
                     break;
                 }
-                case string s:
-                    Console.WriteLine("Got message string: " + s);
+                case DoTell s:
+                    Console.WriteLine("Got tell string: " + s.Message);
+                    break;
+                case AskRequest _:
+                    Console.WriteLine("Got ask request");
+                    Sender.Tell(new AskResponse());
                     break;
             }
         }

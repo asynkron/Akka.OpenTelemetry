@@ -8,7 +8,7 @@ namespace Akka;
 
 public static class ActorOfUtils
 {
-    public static bool NotTraced(Props props, bool systemService, ActorPath path)
+    public static bool NotTraced(bool systemService, ActorPath path)
     {
         return systemService || path.Elements.FirstOrDefault() != "user";
     }
