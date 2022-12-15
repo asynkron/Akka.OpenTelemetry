@@ -24,6 +24,8 @@ public static class Extensions
     {
         var bootstrap = self.WithConfig(
             ConfigurationFactory.ParseString("""
+akka.loglevel=INFO
+akka.loggers=["Akka.Logger.Extensions.Logging.LoggingLogger, Akka.Logger.Extensions.Logging"]
 akka.actor.provider = "Akka.OpenTelemetry.Local.OpenTelemetryLocalActorRefProvider, Akka.OpenTelemetry"
 """));
 

@@ -15,6 +15,7 @@ public class Hooks
 
     public void ActorStopped(OpenTelemetrySettings settings, IActorRef self)
     {
+
     }
 
     public void ActorAroundReceiveMessage(OpenTelemetrySettings settings, OpenTelemetryEnvelope envelope,
@@ -52,18 +53,33 @@ public class Hooks
 
     public void ActorSendSystemMessage(OpenTelemetrySettings settings, ISystemMessage message, IActorRef self)
     {
-        using var activity =
-            OpenTelemetryHelpers.ActivitySource.StartActivity("SendSystemMessage", ActivityKind.Server,
-                settings.ParentSpanId!);
-        activity?.AddTag(OtelTags.ActorType, settings.Context.Props.Type.Name);
-        activity?.AddEvent(new ActivityEvent("SystemMessage: " + message.GetTypeName()));
-
         if (message is Terminate)
             //HACK: actor isn't really stopped yet.
             //but good enough for triggering start / stop metrics
             //TODO: use IActorTelemetryEvent once released
+        {
             ActorStopped(settings, self);
+            return;
+        }
+
+        if (message.GetType().Name == "ActorTaskSchedulerMessage")
+        {
+            ActorAwait(settings, self, message);
+            return;
+        }
+        using var activity =
+            OpenTelemetryHelpers.ActivitySource.StartActivity("SendSystemMessage", ActivityKind.Server,
+                settings.ParentSpanId!);
+        activity?.AddTag(OtelTags.ActorType, settings.Context.Props.Type.Name);
+
+
+        activity?.AddEvent(new ActivityEvent("SystemMessage: " + message.GetTypeName()));
         //  Console.WriteLine($"Sending system message {message} from {actorRef}");
+    }
+
+    private void ActorAwait(OpenTelemetrySettings settings, IActorRef self, ISystemMessage message)
+    {
+        Activity.Current?.AddEvent(new ActivityEvent("Actor Awaits " + self + "  " + message.GetHashCode()));
     }
 
     public void ActorSpawned(OpenTelemetrySettings settings, Props props, IInternalActorRef self)
@@ -119,18 +135,19 @@ public class Hooks
 
     public void ActorRefRestart(IActorRef actorRef, Exception cause)
     {
-
+        Activity.Current?.AddEvent(new ActivityEvent("ActorRefRestart " + actorRef + " " + cause?.ToString()));
     }
 
     public void ActorRefStop(IActorRef actorRef)
     {
-
+        Activity.Current?.AddEvent(new ActivityEvent("ActorRefStop" + actorRef));
     }
 
     public void ActorRefNewCell(IActorRef actorRef,
         ActorSystemImpl system, IInternalActorRef self, Props props, MessageDispatcher dispatcher,
         IInternalActorRef supervisor)
     {
+        Activity.Current?.AddEvent(new ActivityEvent("ActorRefNewCell " + self));
 
     }
 }

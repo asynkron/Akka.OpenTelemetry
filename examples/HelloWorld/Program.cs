@@ -1,16 +1,21 @@
 ﻿using System.Diagnostics;
 using Akka;
 using Akka.Actor;
+using Akka.Event;
+using Akka.Logger.Extensions.Logging;
 using Akka.OpenTelemetry.Telemetry;
 using Demo;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using OpenTelemetry;
+using OpenTelemetry.Logs;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
+var rb = ResourceBuilder.CreateDefault().AddService("Akka.OpenTelemetry.HelloWorld");
 var tracerProvider = Sdk.CreateTracerProviderBuilder()
-    .SetResourceBuilder(ResourceBuilder.CreateDefault()
-        .AddService("Akka.OpenTelemetry.HelloWorld")
-    )
+    .SetResourceBuilder(rb)
     .AddAkkaInstrumentation()
     .AddOtlpExporter(options =>
     {
@@ -19,11 +24,34 @@ var tracerProvider = Sdk.CreateTracerProviderBuilder()
     })
     .Build();
 
+
+var services = new ServiceCollection();
+services.AddLogging(l =>
+{
+    l.SetMinimumLevel(LogLevel.Debug);
+    l.AddOpenTelemetry(
+        options =>
+        {
+            options
+                .SetResourceBuilder(rb)
+                .AddOtlpExporter(o =>
+                {
+                    o.Endpoint = new Uri("http://localhost:4317");
+                    o.ExportProcessorType = ExportProcessorType.Batch;
+                });
+        });
+});
+
+var serviceProvider = services.BuildServiceProvider();
+var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
+LoggingLogger.LoggerFactory = loggerFactory;
+
+
+
 var source = OpenTelemetryHelpers.ActivitySource;
 using (var activity = source.StartActivity("demo", ActivityKind.Client))
 {
     activity?.SetTag("demo", "true");
-
     var bootstrap = BootstrapSetup.Create().WithOpenTelemetry();
 
     var system = ActorSystem.Create("my-system", bootstrap);
@@ -58,12 +86,14 @@ namespace Demo
 
     internal class MyActor : UntypedActor
     {
+        private ILoggingAdapter _logger = Context.GetLogger();
         protected override void OnReceive(object message)
         {
             switch (message)
             {
                 case SpawnChild:
                 {
+                    _logger.Info("Hello From OpenTelemetry");
                     var childProps = Props.Create<MyChildActor>();
                     var reff = Context.ActorOf(childProps);
                     reff.Tell("hello");
