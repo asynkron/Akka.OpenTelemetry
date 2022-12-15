@@ -2,7 +2,6 @@
 using Akka;
 using Akka.Actor;
 using Akka.Event;
-using Akka.Logger.Extensions.Logging;
 using Akka.OpenTelemetry.Telemetry;
 using Demo;
 using Microsoft.Extensions.DependencyInjection;
@@ -44,7 +43,7 @@ services.AddLogging(l =>
 
 var serviceProvider = services.BuildServiceProvider();
 var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
-LoggingLogger.LoggerFactory = loggerFactory;
+
 
 
 

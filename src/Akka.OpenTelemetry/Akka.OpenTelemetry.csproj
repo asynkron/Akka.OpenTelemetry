@@ -21,7 +21,6 @@
 
     <ItemGroup>
         <PackageReference Include="Akka" Version="1.4.43" />
-        <PackageReference Include="Akka.Logger.Extensions.Logging" Version="1.4.22" />
         <PackageReference Include="Akka.Remote" Version="1.4.43" />
         <PackageReference Include="Akka.Cluster" Version="1.4.43" />
         <PackageReference Include="JetBrains.Annotations" Version="2022.3.1" />
