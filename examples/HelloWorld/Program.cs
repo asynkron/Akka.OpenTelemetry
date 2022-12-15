@@ -31,15 +31,19 @@ using (var activity = source.StartActivity("demo", ActivityKind.Client))
     var reff = system.ActorOf(props);
 
     reff.Tell(new SpawnChild());
+
     reff.Tell(new DoTell("Testing"));
     reff.Tell(new DoTell("Testing2"));
     reff.Tell(new DoTell("Testing3"));
-    await reff.Ask<AskResponse>(new AskRequest());
+    var x = await reff.Ask<AskResponse>(new AskRequest());
+    reff.Tell(new DoTell("Testing4"));
+    reff.Tell(new DoTell("Testing5"));
+
 
     reff.Tell(PoisonPill.Instance);
-    await Task.Delay(100);
 }
 
+await Task.Delay(100);
 tracerProvider!.ForceFlush();
 Console.ReadLine();
 

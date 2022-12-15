@@ -57,14 +57,20 @@ public static class OpenTelemetryHelpers
         list.Add(new KeyValuePair<string, string>(key, value));
     }
 
-    public static OpenTelemetryEnvelope ExtractHeaders(object message, Props props)
+    public static OpenTelemetryEnvelope ExtractHeaders(object message, Props props, IActorRef? sender)
     {
         var activity = Activity.Current;
         if (activity is null) return new OpenTelemetryEnvelope(message, Headers.Empty);
 
         var actorRefTag = Activity.Current?.GetTagItem(OtelTags.ActorRef)?.ToString() ?? "NoSender";
 
-        using var tellActivity = BuildStartedActivity(activity.Context, actorRefTag, "Tell",
+        var verb = "Tell";
+        if (sender?.Path.Elements.FirstOrDefault() == "temp")
+        {
+            verb = "Ask";
+        }
+
+        using var tellActivity = BuildStartedActivity(activity.Context, actorRefTag, verb,
             message,
             DefaultSetupActivity);
         tellActivity?.AddTag(OtelTags.ActorType, props.Type.Name);
@@ -73,7 +79,7 @@ public static class OpenTelemetryHelpers
         return envelope;
     }
 
-    public static object ExtractHeaders(object message)
+    public static object ExtractHeaders(object message, IActorRef sender)
     {
         if (message is OpenTelemetryEnvelope alreadyEnvelope) return alreadyEnvelope;
 
@@ -81,7 +87,7 @@ public static class OpenTelemetryHelpers
         if (message is ActorSelectionMessage selectionMessage)
         {
             var innerMessage = selectionMessage.Message;
-            var envelope = ExtractHeaders(innerMessage);
+            var envelope = ExtractHeaders(innerMessage, sender);
             var x = new ActorSelectionMessage(envelope, selectionMessage.Elements, selectionMessage.WildCardFanOut);
             return x;
         }

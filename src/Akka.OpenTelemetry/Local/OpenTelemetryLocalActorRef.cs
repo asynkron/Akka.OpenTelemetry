@@ -16,7 +16,7 @@ public class OpenTelemetryLocalActorRef : LocalActorRef
 
     protected override void TellInternal(object message, IActorRef sender)
     {
-        var envelope = OpenTelemetryHelpers.ExtractHeaders(message, Props);
+        var envelope = OpenTelemetryHelpers.ExtractHeaders(message, Props, sender);
         if (InternalCurrentActorCellKeeper.Current != null)
         {
             var system = InternalCurrentActorCellKeeper.Current.System;

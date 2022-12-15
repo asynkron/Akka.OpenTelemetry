@@ -1,6 +1,8 @@
+using System.Diagnostics;
 using Akka.Actor;
 using Akka.Actor.Internal;
 using Akka.Event;
+using Akka.OpenTelemetry.Telemetry;
 using JetBrains.Annotations;
 
 namespace Akka.OpenTelemetry.Local;
@@ -31,6 +33,13 @@ public sealed class OpenTelemetryLocalActorRefProvider : LocalActorRefProviderDe
 
     // public override FutureActorRef<T> CreateFutureRef<T>(TaskCompletionSource<T> tcs)
     // {
+    //     var a = OpenTelemetryHelpers.ActivitySource.StartActivity();
+    //     tcs.Task.ContinueWith(t =>
+    //     {
+    //         if (!t.IsCompletedSuccessfully) return;
+    //         a?.AddTag(OtelTags.ResponseMessageType, "foo");
+    //         a?.AddEvent(new ActivityEvent("hellos"));
+    //     }, TaskContinuationOptions.ExecuteSynchronously);
     //     var path = TempPath();
     //     var future = new FutureActorRef<T>(tcs, path, this);
     //     return future;

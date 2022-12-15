@@ -20,7 +20,7 @@ public class ActorSelectionAnchorActorRef : IInternalActorRef
         if (message is ActorSelectionMessage asl)
         {
             var m = asl.Message;
-            var envelope = OpenTelemetryHelpers.ExtractHeaders(m);
+            var envelope = OpenTelemetryHelpers.ExtractHeaders(m, sender);
             var a = new ActorSelectionMessage(envelope, asl.Elements, asl.WildCardFanOut);
             _inner.Tell(a, sender);
             return;
