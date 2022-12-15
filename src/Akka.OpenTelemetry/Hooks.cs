@@ -1,5 +1,7 @@
 using System.Diagnostics;
 using Akka.Actor;
+using Akka.Actor.Internal;
+using Akka.Dispatch;
 using Akka.Dispatch.SysMsg;
 using Akka.OpenTelemetry.Telemetry;
 
@@ -42,7 +44,7 @@ public class Hooks
         callback();
     }
 
-    public void ActorSendMessage(OpenTelemetrySettings settings, object message, IActorRef self, IActorRef target,
+    public void ActorRefTell(OpenTelemetrySettings settings, object message, IActorRef self, IActorRef target,
         IActorRef sender)
     {
         //  Console.WriteLine($"Sending message {message} from {actorRef} to {target} with sender {sender}");
@@ -113,5 +115,22 @@ public class Hooks
     public void ActorCreateNewActorInstance(OpenTelemetrySettings settings, ActorBase actorInstance, IActorRef actorRef)
     {
         Activity.Current?.AddEvent(new ActivityEvent("CreateNewActorInstance " + actorInstance.GetType().Name));
+    }
+
+    public void ActorRefRestart(IActorRef actorRef, Exception cause)
+    {
+
+    }
+
+    public void ActorRefStop(IActorRef actorRef)
+    {
+
+    }
+
+    public void ActorRefNewCell(IActorRef actorRef,
+        ActorSystemImpl system, IInternalActorRef self, Props props, MessageDispatcher dispatcher,
+        IInternalActorRef supervisor)
+    {
+
     }
 }

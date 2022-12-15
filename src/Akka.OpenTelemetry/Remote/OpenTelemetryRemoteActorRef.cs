@@ -24,7 +24,7 @@ public class OpenTelemetryRemoteActorRef : RemoteActorRef
             var settings = (InternalCurrentActorCellKeeper.Current as OpenTelemetryActorCell)?.Settings;
             if (settings != null)
                 //only call hook if we are in a tracable actor context
-                system.Hooks().ActorSendMessage(settings, message, self, this, sender);
+                system.Hooks().ActorRefTell(settings, message, self, this, sender);
         }
 
         base.TellInternal(envelope, sender);
