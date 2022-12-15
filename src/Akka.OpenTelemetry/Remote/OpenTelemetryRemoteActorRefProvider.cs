@@ -1,24 +1,42 @@
 using Akka.Actor;
 using Akka.Actor.Internal;
 using Akka.Event;
+using Akka.Remote;
 using JetBrains.Annotations;
 
 namespace Akka.OpenTelemetry.Remote;
 
 [UsedImplicitly]
-public sealed class OpenTelemetryRemoteActorRefProvider : RemoteActorRefProviderDecorator
+public sealed class OpenTelemetryRemoteActorRefProvider : RemoteActorRefProvider, IRemoteActorRefProvider
 {
-    public OpenTelemetryRemoteActorRefProvider(string systemName, Settings settings, EventStream eventStream)
+    public OpenTelemetryRemoteActorRefProvider(string systemName, Settings settings, EventStream eventStream) : base(systemName, settings, eventStream)
     {
-        Inner = new RemoteActorRefProvider2(systemName, settings, eventStream);
     }
 
-    public override void Init(ActorSystemImpl system)
+    protected override IInternalActorRef CreateRemoteRef(Props props, IInternalActorRef supervisor,
+        Address localAddress, ActorPath rpath,
+        Deploy deployment)
     {
-        Inner.Init(system);
+        if (ActorOfUtils.NotTraced(false, rpath))
+            return new RemoteActorRef(Transport, localAddress, rpath, supervisor, props, deployment);
+
+        return new OpenTelemetryRemoteActorRef(Transport, localAddress, rpath, supervisor, props, deployment);
     }
 
-    public override IInternalActorRef ActorOf(ActorSystemImpl system, Props props, IInternalActorRef supervisor,
+    protected override IInternalActorRef CreateRemoteRef(ActorPath actorPath, Address localAddress)
+    {
+        //if the remote is a temp. don't trace it
+        if (ActorOfUtils.NotTraced(false, actorPath))
+        {
+            return new RemoteActorRef(Transport, localAddress, actorPath, ActorRefs.Nobody, Props.None,
+                Deploy.None);
+        }
+
+        return new OpenTelemetryRemoteActorRef(Transport, localAddress, actorPath, ActorRefs.Nobody, Props.None,
+            Deploy.None);
+    }
+
+    public new IInternalActorRef ActorOf(ActorSystemImpl system, Props props, IInternalActorRef supervisor,
         ActorPath path,
         bool systemService, Deploy deploy, bool lookupDeploy, bool async)
     {
@@ -31,10 +49,11 @@ public sealed class OpenTelemetryRemoteActorRefProvider : RemoteActorRefProvider
         return ActorOfUtils.LocalActorOf(system, props, supervisor, path, deploy, lookupDeploy, async);
     }
 
-    public override FutureActorRef<T> CreateFutureRef<T>(TaskCompletionSource<T> tcs)
+    public new FutureActorRef<T> CreateFutureRef<T>(TaskCompletionSource<T> tcs)
     {
         var path = TempPath();
         var future = new FutureActorRef<T>(tcs, path, this);
         return future;
     }
+
 }
