@@ -8,12 +8,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Folder Include="Properties\"/>
+        <Folder Include="Properties\" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Akka" Version="1.4.43"/>
-        <PackageReference Include="Akka.Remote" Version="1.4.43"/>
+        <PackageReference Include="Akka" Version="1.5.0-alpha3" />
+        <PackageReference Include="Akka.Remote" Version="1.5.0-alpha3" />
     </ItemGroup>
 
 </Project>
