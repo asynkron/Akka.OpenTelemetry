@@ -22,6 +22,22 @@ public class OtelLogger : ILoggingAdapter
         return Logger.IsEnabled(ToLogLevel(logLevel));
     }
 
+    public void Log(LogLevel logLevel, Exception cause, string format)
+    {
+#pragma warning disable CA2254
+        Logger.Log(ToLogLevel(logLevel), cause, format);
+#pragma warning restore CA2254
+    }
+
+    public void Log(LogLevel logLevel, Exception cause, LogMessage message)
+    {
+#pragma warning disable CA2254
+        Logger.Log(ToLogLevel(logLevel), cause, message.Format, message.Parameters());
+#pragma warning restore CA2254
+    }
+
+    public ILogMessageFormatter Formatter { get; }
+
     private Microsoft.Extensions.Logging.LogLevel ToLogLevel(LogLevel logLevel) =>
         logLevel switch
         {

@@ -8,14 +8,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Akka" Version="1.5.0-alpha3" />
-        <PackageReference Include="Akka.Remote" Version="1.5.0-alpha3" />
+        <PackageReference Include="Akka" Version="1.5.20" />
+        <PackageReference Include="Akka.Remote" Version="1.5.20" />
         <ProjectReference Include="..\..\..\src\Akka.OpenTelemetry\Akka.OpenTelemetry.csproj" />
         <ProjectReference Include="..\ChatMessages\ChatMessages.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.4.0-beta.3" />
+        <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.9.0-alpha.1" />
     </ItemGroup>
 
 </Project>
