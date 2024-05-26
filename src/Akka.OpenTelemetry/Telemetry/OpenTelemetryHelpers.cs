@@ -79,7 +79,7 @@ public static class OpenTelemetryHelpers
         return envelope;
     }
 
-    public static object ExtractHeaders(object message, IActorRef sender)
+    public static object ExtractHeaders(object message, IActorRef? sender)
     {
         if (message is OpenTelemetryEnvelope alreadyEnvelope) return alreadyEnvelope;
 
@@ -93,11 +93,18 @@ public static class OpenTelemetryHelpers
         }
         else
         {
+
+            var verb = "Tell";
+            if (sender?.Path.Elements.FirstOrDefault() == "temp")
+            {
+                verb = "Ask";
+            }
+
             var activity = Activity.Current;
             if (activity is null) return new OpenTelemetryEnvelope(message, Headers.Empty);
 
             var current = Activity.Current?.GetTagItem(OtelTags.ActorType)?.ToString() ?? "NoSender";
-            using var tellActivity = BuildStartedActivity(activity.Context, current, "Tell",
+            using var tellActivity = BuildStartedActivity(activity.Context, current, verb,
                 message,
                 DefaultSetupActivity);
             tellActivity?.AddTag(OtelTags.ActorType, current);

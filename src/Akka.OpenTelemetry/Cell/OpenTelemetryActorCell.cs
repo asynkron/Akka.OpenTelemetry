@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Akka.Actor;
 using Akka.Actor.Internal;
 using Akka.Dispatch;
@@ -9,6 +10,7 @@ namespace Akka.OpenTelemetry.Cell;
 
 public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
 {
+    private ActorBase? _actor;
     public OpenTelemetryActorCell(ActorSystemImpl system, IInternalActorRef self, Props props,
         MessageDispatcher dispatcher, IInternalActorRef parent) : base(system, self, props, dispatcher, parent)
     {
@@ -22,7 +24,7 @@ public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
 
     public OpenTelemetrySettings Settings { get; }
 
-    public string ActorType => Actor?.ToString() ?? "<null>";
+    public string ActorType => _actor?.ToString() ?? "<null>";
 
     // public override void SendMessage(Envelope message)
     // {
@@ -99,6 +101,7 @@ public class OpenTelemetryActorCell : ActorCell, IActorRefFactory
     protected override ActorBase CreateNewActorInstance()
     {
         var res = base.CreateNewActorInstance();
+        _actor = res;
         System.Hooks().ActorCreateNewActorInstance(Settings, res, Self);
         return res;
     }
